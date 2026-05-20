@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="description" content="English Master - Tu camino de B1 a C1" />
+  <meta http-equiv="Content-Security-Policy" content="connect-src *;" />
+  <link rel="manifest" href="manifest.json" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(r => console.log('SW registered:', r.scope))
+          .catch(e => console.log('SW error:', e));
+      });
+    }
+  </script>
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>English Master</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #12121a;
+      --bg3: #1a1a26;
+      --border: rgba(255,255,255,0.08);
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43e97b;
+      --text: #f0f0f8;
+      --text2: #9090b0;
+      --card: rgba(255,255,255,0.04);
+      --gold: #ffd166;
+      --radius: 16px;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 60px;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
+    .nav-logo span { color: var(--accent); }
+    .nav-tabs { display: flex; gap: 4px; }
+    .nav-tab {
+      background: none; border: none; color: var(--text2);
+      font-family: var(--font-body); font-size: 0.78rem; font-weight: 500;
+      padding: 6px 12px; border-radius: 8px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-tab.active, .nav-tab:hover { background: var(--bg3); color: var(--text); }
+    .nav-tab.active { color: var(--accent); }
+    .nav-streak {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; color: var(--gold);
+      background: rgba(255,209,102,0.1); border-radius: 20px; padding: 4px 12px;
+    }
+    /* SCREENS */
+    .screen { display: none; padding: 80px 20px 100px; max-width: 800px; margin: 0 auto; animation: fadeUp 0.4s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: translateY(0); } }
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; background: rgba(10,10,15,0.95);
+      backdrop-filter: blur(20px); border-top: 1px solid var(--border);
+      z-index: 100; padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+    }
+    .bn-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: none; border: none; color: var(--text2);
+      font-family: var(--font-body); font-size: 0.65rem; cursor: pointer;
+      padding: 6px; transition: all 0.2s;
+    }
+    .bn-item .icon { font-size: 1.3rem; transition: transform 0.2s; }
+    .bn-item.active { color: var(--accent); }
+    .bn-item.active .icon { transform: scale(1.15); }
+    /* HERO / DASHBOARD */
+    .level-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
+      border-radius: 20px; padding: 6px 16px;
+      font-family: var(--font-display); font-size: 0.8rem; letter-spacing: 0.1em;
+      color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
+    }
+    h1.hero { font-family: var(--font-display); font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; line-height: 1.1; margin-bottom: 8px; }
+    h1.hero em { color: var(--accent); font-style: normal; }
+    .hero-sub { color: var(--text2); font-size: 0.95rem; margin-bottom: 28px; line-height: 1.6; }
+    /* PROGRESS BAR */
+    .prog-wrap { margin-bottom: 28px; }
+    .prog-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text2); margin-bottom: 8px; }
+    .prog-track { height: 8px; background: var(--bg3); border-radius: 99px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 99px; transition: width 1s ease; }
+    /* CARDS GRID */
+    .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .stat-card .label { font-size: 0.72rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; }
+    .stat-card .value { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; }
+    .stat-card .sub { font-size: 0.75rem; color: var(--text2); }
+    /* MODULE CARDS */
+    .module-list { display: flex; flex-direction: column; gap: 12px; }
+    .module-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+      cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+    }
+    .module-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--accent) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .module-card:hover::before { opacity: 0.07; }
+    .module-card:hover { border-color: rgba(108,99,255,0.4); transform: translateY(-2px); }
+    .mod-icon { font-size: 2rem; flex-shrink: 0; width: 48px; text-align: center; }
+    .mod-info { flex: 1; }
+    .mod-info h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; margin-bottom: 2px; }
+    .mod-info p { font-size: 0.78rem; color: var(--text2); }
+    .mod-badge {
+      font-size: 0.65rem; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+      background: rgba(108,99,255,0.2); color: var(--accent); flex-shrink: 0;
+    }
+    .mod-badge.new { background: rgba(67,233,123,0.15); color: var(--accent3); }
+    .mod-badge.locked { background: rgba(255,255,255,0.05); color: var(--text2); }
+    /* TODAY'S PLAN */
+    .today-section { margin-bottom: 24px; }
+    .section-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .section-title .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .task-list { display: flex; flex-direction: column; gap: 8px; }
+    .task-item {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 16px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .task-item:hover { border-color: rgba(108,99,255,0.3); }
+    .task-item.done { opacity: 0.5; }
+    .task-check {
+      width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 0.75rem; transition: all 0.2s;
+    }
+    .task-item.done .task-check { background: var(--accent3); border-color: var(--accent3); }
+    .task-text { flex: 1; font-size: 0.85rem; }
+    .task-time { font-size: 0.72rem; color: var(--text2); }
+    /* LESSON SCREEN */
+    .lesson-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .back-btn {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text2); padding: 8px 14px; cursor: pointer; font-size: 0.85rem;
+      transition: all 0.2s; font-family: var(--font-body);
+    }
+    .back-btn:hover { color: var(--text); border-color: var(--accent); }
+    .lesson-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; }
+    .lesson-body { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; line-height: 1.7; }
+    .lesson-body h2 { font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 12px; color: var(--accent); }
+    .lesson-body p { color: var(--text2); font-size: 0.9rem; margin-bottom: 12px; }
+    .lesson-body .highlight { color: var(--text); background: rgba(108,99,255,0.12); padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+    .lesson-body ul { padding-left: 20px; color: var(--text2); font-size: 0.9rem; }
+    .lesson-body ul li { margin-bottom: 6px; }
+    .btn-primary {
+      background: var(--accent); color: white; border: none; border-radius: 12px;
+      padding: 14px 28px; font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; width: 100%; transition: all 0.2s; letter-spacing: 0.02em;
+    }
+    .btn-primary:hover { background: #7c74ff; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(108,99,255,0.3); }
+    .btn-secondary {
+      background: var(--card); color: var(--text); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 24px; font-family: var(--font-body); font-size: 0.9rem;
+      cursor: pointer; width: 100%; margin-top: 10px; transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    /* QUIZ */
+    .quiz-progress { display: flex; gap: 4px; margin-bottom: 24px; }
+    .qp-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--bg3); transition: all 0.3s; }
+    .qp-dot.done { background: var(--accent3); }
+    .qp-dot.current { background: var(--accent); }
+    .question-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; }
+    .question-num { font-size: 0.72rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .question-text { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; line-height: 1.4; }
+    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .option-btn {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 18px; text-align: left; cursor: pointer; font-family: var(--font-body);
+      font-size: 0.88rem; color: var(--text); transition: all 0.2s;
+    }
+    .option-btn:hover { border-color: var(--accent); background: rgba(108,99,255,0.08); }
+    .option-btn.correct { background: rgba(67,233,123,0.1); border-color: var(--accent3); color: var(--accent3); }
+    .option-btn.wrong { background: rgba(255,101,132,0.1); border-color: var(--accent2); color: var(--accent2); }
+    .feedback-box {
+      background: var(--bg3); border-radius: 12px; padding: 16px;
+      font-size: 0.85rem; line-height: 1.6; color: var(--text2); margin-bottom: 16px;
+      border-left: 3px solid var(--accent);
+    }
+    /* AI TUTOR */
+    .chat-container { display: flex; flex-direction: column; height: calc(100vh - 180px); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 4px 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; }
+    .msg { max-width: 85%; animation: fadeUp 0.3s ease; }
+    .msg.user { align-self: flex-end; }
+    .msg.ai { align-self: flex-start; }
+    .msg-bubble {
+      padding: 12px 16px; border-radius: 16px; font-size: 0.88rem; line-height: 1.6;
+    }
+    .msg.user .msg-bubble { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+    .msg.ai .msg-bubble {
+      background: var(--bg3); border: 1px solid var(--border); border-bottom-left-radius: 4px;
+    }
+    .msg-meta { font-size: 0.65rem; color: var(--text2); margin-top: 4px; padding: 0 4px; }
+    .msg.user .msg-meta { text-align: right; }
+    .chat-input-row { display: flex; gap: 8px; align-items: flex-end; }
+    .chat-input {
+      flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px 16px; color: var(--text); font-family: var(--font-body); font-size: 0.88rem;
+      resize: none; outline: none; max-height: 120px; line-height: 1.5; transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--accent); }
+    .chat-send {
+      background: var(--accent); border: none; border-radius: 12px; width: 44px; height: 44px;
+      color: white; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; flex-shrink: 0;
+    }
+    .chat-send:hover { background: #7c74ff; transform: scale(1.05); }
+    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    /* AI thinking */
+    .thinking-dots { display: flex; gap: 4px; padding: 4px 0; }
+    .thinking-dots span {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--text2);
+      animation: blink 1.2s infinite;
+    }
+    .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100% { opacity:0.2; } 40% { opacity:1; } }
+    /* VOCAB */
+    .vocab-card-wrap { perspective: 600px; margin-bottom: 20px; }
+    .vocab-card {
+      background: linear-gradient(135deg, var(--bg3), var(--bg2));
+      border: 1px solid var(--border); border-radius: 20px;
+      min-height: 200px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px; text-align: center; cursor: pointer;
+      transition: transform 0.6s; transform-style: preserve-3d;
+      position: relative;
+    }
+    .vocab-card.flipped { transform: rotateY(180deg); }
+    .vocab-front, .vocab-back {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 32px;
+      backface-visibility: hidden;
+    }
+    .vocab-back { transform: rotateY(180deg); }
+    .vocab-word { font-family: var(--font-display); font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+    .vocab-phonetic { color: var(--text2); font-size: 0.85rem; margin-bottom: 8px; }
+    .vocab-hint { font-size: 0.78rem; color: var(--text2); }
+    .vocab-definition { font-size: 0.95rem; color: var(--text); line-height: 1.6; margin-bottom: 12px; }
+    .vocab-example { font-style: italic; color: var(--text2); font-size: 0.85rem; }
+    .vocab-nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .vocab-btn {
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 18px; color: var(--text); cursor: pointer;
+      font-family: var(--font-body); font-size: 0.82rem; transition: all 0.2s;
+    }
+    .vocab-btn:hover { border-color: var(--accent); }
+    .vocab-btn.good { border-color: var(--accent3); color: var(--accent3); }
+    .vocab-btn.bad { border-color: var(--accent2); color: var(--accent2); }
+    /* PROFILE */
+    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px; }
+    .profile-name { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 4px; }
+    .profile-level { text-align: center; color: var(--text2); font-size: 0.85rem; margin-bottom: 24px; }
+    .achievements { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 24px; }
+    .ach-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; }
+    .ach-icon { font-size: 1.5rem; margin-bottom: 4px; }
+    .ach-label { font-size: 0.65rem; color: var(--text2); }
+    .ach-val { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+    /* LOADING */
+    .loading-overlay {
+      position: fixed; inset: 0; background: var(--bg); z-index: 999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+    }
+    .loading-logo { font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; }
+    .loading-logo span { color: var(--accent); }
+    .loading-bar { width: 200px; height: 3px; background: var(--bg3); border-radius: 99px; overflow: hidden; }
+    .loading-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); animation: load 1.5s ease forwards; }
+    @keyframes load { from { width:0; } to { width:100%; } }
+    .loading-text { font-size: 0.8rem; color: var(--text2); }
+    /* Responsive */
+    @media (max-width: 480px) {
+      .cards-grid { grid-template-columns: repeat(2,1fr); }
+      h1.hero { font-size: 1.6rem; }
+    }
+    /* Week calendar */
+    .week-row { display: flex; gap: 6px; margin-bottom: 24px; }
+    .day-dot {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 8px 4px; font-size: 0.65rem; color: var(--text2);
+    }
+    .day-dot .d { font-family: var(--font-display); font-size: 0.85rem; font-weight: 700; color: var(--text); }
+    .day-dot.active { border-color: var(--accent); background: rgba(108,99,255,0.1); }
+    .day-dot.done .d-mark { color: var(--accent3); }
+    .d-mark { font-size: 0.8rem; }
+    /* Tabs inside screens */
+    .inner-tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+    .inner-tab {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 7px 16px; font-size: 0.78rem; color: var(--text2); cursor: pointer;
+      white-space: nowrap; transition: all 0.2s; font-family: var(--font-body);
+    }
+    .inner-tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+    /* Score badge */
+    .score-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-display); font-size: 2rem; font-weight: 800;
+      color: var(--accent3); margin-bottom: 8px;
+    }
+    .tip-card { background: rgba(108,99,255,0.07); border: 1px solid rgba(108,99,255,0.2); border-radius: 12px; padding: 14px 16px; font-size: 0.83rem; color: var(--text2); line-height: 1.6; margin-bottom: 12px; }
+    .tip-card strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-logo">English<span>Master</span></div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+  <div class="loading-text">Preparando tu plan B1 → C1...</div>
+</div>
+
+<!-- NAV TOP -->
+<nav>
+  <div class="nav-logo">English<span>Master</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showScreen('home')">Inicio</button>
+    <button class="nav-tab" onclick="showScreen('lessons')">Lecciones</button>
+    <button class="nav-tab" onclick="showScreen('ai')">IA Tutor</button>
+  </div>
+  <div class="nav-streak" id="streakBadge">🔥 <span id="streakNum">0</span></div>
+</nav>
+
+<!-- ====== HOME ====== -->
+<div class="screen active" id="screen-home">
+  <div class="level-badge">📊 Nivel actual: B1 → objetivo C1</div>
+  <h1 class="hero">Tu ruta al<br/><em>nivel C1</em></h1>
+  <p class="hero-sub">Estudia 1 hora diaria y alcanza el C1 antes de fin de año. Plan personalizado y progresivo con IA.</p>
+
+  <div class="prog-wrap">
+    <div class="prog-header">
+      <span>Progreso general B1 → C1</span>
+      <span id="progPct">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Week -->
+  <div class="section-title"><div class="dot"></div> Esta semana</div>
+  <div class="week-row" id="weekRow"></div>
+
+  <!-- Stats -->
+  <div class="cards-grid">
+    <div class="stat-card">
+      <div class="label">Palabras aprendidas</div>
+      <div class="value" id="wordsLearned">0</div>
+      <div class="sub">de 2,000 objetivo</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Lecciones hechas</div>
+      <div class="value" id="lessonsDown">0</div>
+      <div class="sub">de 120 totales</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Racha actual</div>
+      <div class="value" id="streakDays">0</div>
+      <div class="sub">días seguidos 🔥</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Puntaje promedio</div>
+      <div class="value" id="avgScore">—</div>
+      <div class="sub">en evaluaciones</div>
+    </div>
+  </div>
+
+  <!-- Today's plan -->
+  <div class="today-section">
+    <div class="section-title"><div class="dot"></div> Plan de hoy (60 min)</div>
+    <div class="task-list" id="todayTasks"></div>
+  </div>
+</div>
+
+<!-- ====== LESSONS ====== -->
+<div class="screen" id="screen-lessons">
+  <h2 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;margin-bottom:6px;">Módulos de estudio</h2>
+  <p style="color:var(--text2);font-size:0.85rem;margin-bottom:20px;">Progresión B1→B2→C1 con métodos variados</p>
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="filterModules('all',this)">Todos</button>
+    <button class="inner-tab" onclick="filterModules('grammar',this)">Gramática</button>
+    <button class="inner-tab" onclick="filterModules('vocab',this)">Vocabulario</button>
+    <button class="inner-tab" onclick="filterModules('listening',this)">Listening</button>
+    <button class="inner-tab" onclick="filterModules('writing',this)">Writing</button>
+    <button class="inner-tab" onclick="filterModules('reading',this)">Reading</button>
+  </div>
+  <div class="module-list" id="moduleList"></div>
+</div>
+
+<!-- ====== LESSON DETAIL ====== -->
+<div class="screen" id="screen-lesson-detail">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="showScreen('lessons')">← Volver</button>
+    <div class="lesson-title" id="lessonDetailTitle"></div>
+  </div>
+  <div id="lessonDetailContent"></div>
+</div>
+
+<!-- ====== VOCAB FLASHCARDS ====== -->
+<div class="screen" id="screen-vocab">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="showScreen('lessons')">← Volver</button>
+    <div class="lesson-title">Flashcards de Vocabulario</div>
+  </div>
+  <div style="font-size:0.8rem;color:var(--text2);margin-bottom:16px;text-align:center;" id="vocabCounter">Tarjeta 1 de 10</div>
+  <div class="vocab-card-wrap">
+    <div class="vocab-card" id="vocabCard" onclick="flipCard()">
+      <div class="vocab-front">
+        <div class="vocab-word" id="vcWord">—</div>
+        <div class="vocab-phonetic" id="vcPhon">—</div>
+        <div class="vocab-hint">Toca para ver la definición</div>
+      </div>
+      <div class="vocab-back">
+        <div class="vocab-definition" id="vcDef">—</div>
+        <div class="vocab-example" id="vcEx">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="vocab-nav">
+    <button class="vocab-btn bad" onclick="rateCard('bad')">😕 Difícil</button>
+    <button class="vocab-btn" onclick="rateCard('ok')">😐 Más o menos</button>
+    <button class="vocab-btn good" onclick="rateCard('good')">✅ La sé</button>
+  </div>
+  <div style="margin-top:16px;font-size:0.78rem;color:var(--text2);text-align:center;" id="vocabScore">Conocidas: 0 | Difíciles: 0</div>
+</div>
+
+<!-- ====== QUIZ ====== -->
+<div class="screen" id="screen-quiz">
+  <div class="lesson-header">
+    <button class="back-btn" onclick="showScreen('lessons')">← Salir</button>
+    <div class="lesson-title" id="quizTitle">Evaluación</div>
+  </div>
+  <div class="quiz-progress" id="quizProgress"></div>
+  <div id="quizContent"></div>
+</div>
+
+<!-- ====== AI TUTOR ====== -->
+<div class="screen" id="screen-ai">
+  <h2 style="font-family:var(--font-display);font-size:1.3rem;font-weight:800;margin-bottom:4px;">Tutor IA</h2>
+  <p style="color:var(--text2);font-size:0.82rem;margin-bottom:16px;">Practica inglés, corrige errores, haz preguntas sobre gramática</p>
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="setAIMode('conversation',this)">Conversación</button>
+    <button class="inner-tab" onclick="setAIMode('grammar',this)">Corregir texto</button>
+    <button class="inner-tab" onclick="setAIMode('writing',this)">Writing coach</button>
+    <button class="inner-tab" onclick="setAIMode('exam',this)">Simulacro exam</button>
+  </div>
+  <div class="chat-container">
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="chatInput" placeholder="Escribe en inglés o español..." rows="1" onkeydown="handleChatKey(event)"></textarea>
+      <button class="chat-send" id="chatSendBtn" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PROFILE ====== -->
+<div class="screen" id="screen-profile">
+  <div class="profile-avatar">🧑‍🎓</div>
+  <div class="profile-name">Estudiante B1→C1</div>
+  <div class="profile-level">Comenzó en B1 · Objetivo: C1 antes de dic 2026</div>
+  <div class="achievements" id="achievements"></div>
+  <div class="section-title"><div class="dot"></div> Historial de evaluaciones</div>
+  <div id="evalHistory" style="display:flex;flex-direction:column;gap:8px;"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="bn-item active" onclick="showScreen('home')" id="bn-home">
+    <span class="icon">🏠</span><span>Inicio</span>
+  </button>
+  <button class="bn-item" onclick="showScreen('lessons')" id="bn-lessons">
+    <span class="icon">📚</span><span>Lecciones</span>
+  </button>
+  <button class="bn-item" onclick="showScreen('vocab')" id="bn-vocab">
+    <span class="icon">🃏</span><span>Vocab</span>
+  </button>
+  <button class="bn-item" onclick="showScreen('ai')" id="bn-ai">
+    <span class="icon">🤖</span><span>IA Tutor</span>
+  </button>
+  <button class="bn-item" onclick="showScreen('profile')" id="bn-profile">
+    <span class="icon">👤</span><span>Perfil</span>
+  </button>
+</div>
+
+<script>
+// ===== DATA =====
+const MODULES = [
+  { id:'g1', cat:'grammar', icon:'📐', title:'Conditionals B1→B2', desc:'Condicionales 1,2,3 y mixtos', badge:'En curso', level:'B1', lessons:8 },
+  { id:'g2', cat:'grammar', icon:'🔀', title:'Modal Verbs avanzados', desc:'must, should, might, ought to...', badge:'B2', level:'B2', lessons:6 },
+  { id:'g3', cat:'grammar', icon:'📎', title:'Passive Voice completo', desc:'Todas las formas pasivas', badge:'B1', level:'B1', lessons:5 },
+  { id:'g4', cat:'grammar', icon:'🔗', title:'Reported Speech', desc:'Discurso indirecto avanzado', badge:'B2', level:'B2', lessons:6 },
+  { id:'g5', cat:'grammar', icon:'⚡', title:'Advanced Tenses C1', desc:'Perfect aspect y narrative tenses', badge:'C1', level:'C1', lessons:7 },
+  { id:'g6', cat:'grammar', icon:'🎯', title:'Inversion & Emphasis', desc:'Estructuras enfáticas formales', badge:'C1', level:'C1', lessons:5 },
+  { id:'v1', cat:'vocab', icon:'📖', title:'Academic Vocabulary', desc:'Palabras clave para textos formales', badge:'B2', level:'B2', lessons:10 },
+  { id:'v2', cat:'vocab', icon:'💼', title:'Business English', desc:'Vocabulario profesional y corporativo', badge:'B2', level:'B2', lessons:8 },
+  { id:'v3', cat:'vocab', icon:'🔤', title:'Phrasal Verbs esenciales', desc:'100 phrasal verbs más usados', badge:'B1', level:'B1', lessons:10 },
+  { id:'v4', cat:'vocab', icon:'🌐', title:'Collocations C1', desc:'Combinaciones de palabras naturales', badge:'C1', level:'C1', lessons:8 },
+  { id:'l1', cat:'listening', icon:'🎧', title:'Podcast comprehension', desc:'Escucha activa con ejercicios', badge:'B2', level:'B2', lessons:6 },
+  { id:'l2', cat:'listening', icon:'🎬', title:'Accents & Connected speech', desc:'Habla nativa y reducción fonética', badge:'B2', level:'B2', lessons:5 },
+  { id:'w1', cat:'writing', icon:'✍️', title:'Essay Writing B2→C1', desc:'Argumentación académica formal', badge:'B2', level:'B2', lessons:8 },
+  { id:'w2', cat:'writing', icon:'📧', title:'Formal Emails & Letters', desc:'Correspondencia profesional', badge:'B1', level:'B1', lessons:5 },
+  { id:'r1', cat:'reading', icon:'📰', title:'Complex text analysis', desc:'Textos académicos y periodísticos', badge:'B2', level:'B2', lessons:7 },
+  { id:'r2', cat:'reading', icon:'🔍', title:'Reading strategies C1', desc:'Skimming, scanning, inference', badge:'C1', level:'C1', lessons:6 },
+];
+
+const VOCAB_DECK = [
+  { word:'Nevertheless', phon:'/ˌnevəðəˈles/', def:'In spite of that; however. Used to introduce a contrast.', ex:'"The task was difficult; nevertheless, she completed it on time."' },
+  { word:'Albeit', phon:'/ɔːlˈbiːɪt/', def:'Although; even though. Formal concession.', ex:'"It was a small, albeit significant, improvement."' },
+  { word:'Pursuant to', phon:'/pərˈsuːənt/', def:'In accordance with; following a rule or plan.', ex:'"Pursuant to company policy, all expenses must be approved."' },
+  { word:'Encompass', phon:'/ɪnˈkʌmpəs/', def:'To include a wide range of things; to surround completely.', ex:'"The project encompasses all aspects of marketing."' },
+  { word:'Mitigate', phon:'/ˈmɪtɪɡeɪt/', def:'To make something less severe, serious, or painful.', ex:'"Measures were taken to mitigate the environmental impact."' },
+  { word:'Inherent', phon:'/ɪnˈhɪərənt/', def:'Existing as a natural or permanent part of something.', ex:'"There are inherent risks in any financial investment."' },
+  { word:'Contentious', phon:'/kənˈtenʃəs/', def:'Causing or likely to cause argument; controversial.', ex:'"Immigration remains a contentious political issue."' },
+  { word:'Pragmatic', phon:'/præɡˈmætɪk/', def:'Dealing with things realistically and practically.', ex:'"We need a pragmatic approach to solve this crisis."' },
+  { word:'Ambiguous', phon:'/æmˈbɪɡjuəs/', def:'Open to more than one interpretation; not clear.', ex:'"The contract contained several ambiguous clauses."' },
+  { word:'Unprecedented', phon:'/ʌnˈpresɪdentɪd/', def:'Never done or known before; without previous example.', ex:'"The pandemic caused an unprecedented global shutdown."' },
+];
+
+const QUIZ_BANKS = {
+  g1: [
+    { q:"If I ___ more money, I would travel the world.", opts:["have","had","would have","has"], ans:1, exp:"Second conditional: If + past simple, would + base verb. Expresses hypothetical situations." },
+    { q:"By this time next year, she ___ her degree.", opts:["will finish","will have finished","has finished","finished"], ans:1, exp:"Future Perfect expresses an action completed before a specific future time." },
+    { q:"I wish I ___ speak Spanish fluently.", opts:["can","could","would","will"], ans:1, exp:"'Wish + could' expresses a desire for a present ability you don't have." },
+    { q:"Had I known about the meeting, I ___ attended.", opts:["would","will have","would have","had"], ans:2, exp:"Third conditional with inversion: Had I known = If I had known." },
+    { q:"___ she studied harder, she might have passed.", opts:["If","Had","Should","Were"], ans:1, exp:"Inversion in third conditional: Had she studied = If she had studied." },
+  ],
+  v1: [
+    { q:"The research findings ___ previous theories about climate change.", opts:["corroborate","corroborates","corroborating","corroborated"], ans:3, exp:"'Corroborate' = to confirm or support with evidence. Past tense here." },
+    { q:"The new policy aims to ___ the gap between rich and poor.", opts:["widen","bridge","extend","break"], ans:1, exp:"'Bridge the gap' is a common collocation meaning to reduce a difference." },
+    { q:"Her argument was ___ by strong statistical evidence.", opts:["substantiated","substantial","substance","substantially"], ans:0, exp:"'Substantiate' = to provide evidence to support a claim." },
+    { q:"The committee will ___ the proposal at the next meeting.", opts:["scrutinize","scrutiny","scrutinizing","scrutinized"], ans:0, exp:"'Scrutinize' = to examine carefully and critically." },
+    { q:"This phenomenon is ___ in tropical regions.", opts:["prevalence","prevalent","prevailing","prevailed"], ans:1, exp:"'Prevalent' (adjective) = widespread, commonly found." },
+  ],
+};
+
+const TODAY_TASKS = [
+  { id:'t1', text:'Gramática: Conditionals B2 (20 min)', time:'20 min', screen:'lesson', lessonId:'g1' },
+  { id:'t2', text:'Vocabulario: Flashcards académico (15 min)', time:'15 min', screen:'vocab' },
+  { id:'t3', text:'Evaluación rápida: Modal Verbs (10 min)', time:'10 min', screen:'quiz', quizId:'g1' },
+  { id:'t4', text:'IA Tutor: Práctica de conversación (15 min)', time:'15 min', screen:'ai' },
+];
+
+const LESSON_CONTENT = {
+  g1: `
+    <div class="lesson-body">
+      <h2>🎯 Conditional Sentences: B2 Level</h2>
+      <p>Los condicionales son esenciales para el inglés B2-C1. Hoy vemos los <strong>tipos 2, 3 y mixtos</strong>.</p>
+      
+      <h2>Type 2 – Hypothetical Present/Future</h2>
+      <p>Estructura: <span class="highlight">If + Past Simple, would + base verb</span></p>
+      <ul>
+        <li>"If I <strong>had</strong> more time, I <strong>would study</strong> Italian."</li>
+        <li>"She <strong>would travel</strong> more if she <strong>earned</strong> a higher salary."</li>
+      </ul>
+      
+      <h2>Type 3 – Hypothetical Past</h2>
+      <p>Estructura: <span class="highlight">If + Past Perfect, would have + past participle</span></p>
+      <ul>
+        <li>"If I <strong>had studied</strong> harder, I <strong>would have passed</strong>."</li>
+        <li>"They <strong>would have won</strong> if the referee <strong>hadn't made</strong> that call."</li>
+      </ul>
+      
+      <h2>⚡ Inversion (C1 feature)</h2>
+      <p>En inglés formal, puedes omitir "if" e invertir el sujeto:</p>
+      <ul>
+        <li>"<span class="highlight">Had I known</span>" = "If I had known"</li>
+        <li>"<span class="highlight">Were I to leave</span>" = "If I were to leave"</li>
+        <li>"<span class="highlight">Should you need</span> help..." = "If you need help..."</li>
+      </ul>
+      
+      <h2>Mixed Conditionals</h2>
+      <p>Combinan tipos 2 y 3: <span class="highlight">If + Past Perfect (past), would + base verb (present result)</span></p>
+      <ul>
+        <li>"If I <strong>had taken</strong> that job, I <strong>would be</strong> living in London now."</li>
+      </ul>
+    </div>
+    <button class="btn-primary" onclick="startQuiz('g1')">📝 Hacer evaluación (5 preguntas)</button>
+    <button class="btn-secondary" onclick="showScreen('lessons')">Volver a módulos</button>
+  `,
+  v1: `
+    <div class="lesson-body">
+      <h2>📖 Academic Vocabulary – Nivel B2</h2>
+      <p>Este módulo te enseña el vocabulario clave para leer y escribir textos académicos y profesionales.</p>
+      
+      <h2>Verbos de argumentación académica</h2>
+      <ul>
+        <li><span class="highlight">substantiate</span> – to provide evidence for a claim</li>
+        <li><span class="highlight">corroborate</span> – to confirm or support</li>
+        <li><span class="highlight">scrutinize</span> – to examine carefully</li>
+        <li><span class="highlight">postulate</span> – to suggest as a theory</li>
+        <li><span class="highlight">refute</span> – to prove wrong</li>
+      </ul>
+      
+      <h2>Conectores discursivos C1</h2>
+      <ul>
+        <li><span class="highlight">Furthermore</span> – Además (formal)</li>
+        <li><span class="highlight">Nevertheless</span> – Sin embargo (fuerte)</li>
+        <li><span class="highlight">Albeit</span> – Aunque (formal)</li>
+        <li><span class="highlight">Notwithstanding</span> – A pesar de</li>
+        <li><span class="highlight">Insofar as</span> – En la medida en que</li>
+      </ul>
+      
+      <h2>Collocations clave</h2>
+      <ul>
+        <li>"<span class="highlight">bridge the gap</span>" between theory and practice</li>
+        <li>"<span class="highlight">raise awareness</span>" of an issue</li>
+        <li>"<span class="highlight">draw conclusions</span>" from data</li>
+        <li>"<span class="highlight">address concerns</span>" raised by stakeholders</li>
+      </ul>
+    </div>
+    <button class="btn-primary" onclick="startQuiz('v1')">📝 Hacer evaluación</button>
+    <button class="btn-secondary" onclick="showScreen('lessons')">Volver</button>
+  `,
+};
+
+// ===== STATE =====
+let state = JSON.parse(localStorage.getItem('em_state') || '{}');
+state = Object.assign({ streak:0, wordsLearned:0, lessonsDown:0, scores:[], doneTasks:[], vocabIdx:0, vocabGood:0, vocabBad:0, progress:0, lastDate:'' }, state);
+
+let currentQuiz = { questions:[], idx:0, score:0, id:'' };
+let aiMode = 'conversation';
+let chatHistory = [];
+let vocabFlipped = false;
+
+// ===== SAVE =====
+function saveState() { localStorage.setItem('em_state', JSON.stringify(state)); }
+
+// ===== STREAK =====
+function checkStreak() {
+  const today = new Date().toDateString();
+  if (state.lastDate !== today) {
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (state.lastDate === yesterday) state.streak++;
+    else if (state.lastDate !== today) state.streak = 1;
+    state.lastDate = today;
+    saveState();
+  }
+}
+
+// ===== INIT =====
+function init() {
+  checkStreak();
+  setTimeout(() => {
+    document.getElementById('loading').style.display = 'none';
+    renderDashboard();
+    renderModules('all');
+    renderVocab();
+    initChat();
+    renderProfile();
+  }, 1600);
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  document.getElementById('streakNum').textContent = state.streak;
+  document.getElementById('streakDays').textContent = state.streak;
+  document.getElementById('wordsLearned').textContent = state.wordsLearned;
+  document.getElementById('lessonsDown').textContent = state.lessonsDown;
+  const avgEl = document.getElementById('avgScore');
+  avgEl.textContent = state.scores.length ? Math.round(state.scores.reduce((a,b)=>a+b,0)/state.scores.length) + '%' : '—';
+  const pct = Math.min(100, Math.round(state.progress));
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+  renderWeek();
+  renderTasks();
+}
+
+function renderWeek() {
+  const days = ['L','M','X','J','V','S','D'];
+  const today = new Date().getDay();
+  const row = document.getElementById('weekRow');
+  row.innerHTML = '';
+  days.forEach((d,i) => {
+    const isToday = (i+1)%7 === today%7;
+    const done = state.doneTasks.length > 0 && i < today;
+    row.innerHTML += `<div class="day-dot ${isToday?'active':''} ${done?'done':''}">
+      <div class="d">${d}</div>
+      <div class="d-mark">${done?'✓':'·'}</div>
+    </div>`;
+  });
+}
+
+function renderTasks() {
+  const list = document.getElementById('todayTasks');
+  list.innerHTML = '';
+  TODAY_TASKS.forEach(t => {
+    const done = state.doneTasks.includes(t.id);
+    const action = t.screen === 'lesson' ? `openLesson('${t.lessonId}')` :
+                   t.screen === 'quiz' ? `startQuiz('${t.quizId}')` :
+                   t.screen === 'vocab' ? `showScreen('vocab')` : `showScreen('ai')`;
+    list.innerHTML += `<div class="task-item ${done?'done':''}" onclick="${action}">
+      <div class="task-check">${done?'✓':''}</div>
+      <div class="task-text">${t.text}</div>
+      <div class="task-time">${t.time}</div>
+    </div>`;
+  });
+}
+
+// ===== MODULES =====
+function renderModules(cat) {
+  const list = document.getElementById('moduleList');
+  const filtered = cat === 'all' ? MODULES : MODULES.filter(m => m.cat === cat);
+  list.innerHTML = '';
+  filtered.forEach(m => {
+    const badgeClass = m.level === 'C1' ? 'locked' : m.level === 'B1' ? 'new' : '';
+    list.innerHTML += `<div class="module-card" onclick="openLesson('${m.id}')">
+      <div class="mod-icon">${m.icon}</div>
+      <div class="mod-info">
+        <h3>${m.title}</h3>
+        <p>${m.desc} · ${m.lessons} lecciones</p>
+      </div>
+      <div class="mod-badge ${badgeClass}">${m.level}</div>
+    </div>`;
+  });
+}
+
+function filterModules(cat, btn) {
+  document.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderModules(cat);
+}
+
+// ===== LESSON =====
+function openLesson(id) {
+  document.getElementById('lessonDetailTitle').textContent = MODULES.find(m=>m.id===id)?.title || '';
+  document.getElementById('lessonDetailContent').innerHTML = LESSON_CONTENT[id] || `
+    <div class="lesson-body">
+      <h2>🚧 Lección en preparación</h2>
+      <p>Esta lección estará disponible pronto. El contenido se genera progresivamente según tu avance.</p>
+      <div class="tip-card"><strong>💡 Tip:</strong> Mientras tanto, practica con el tutor IA pidiéndole que te explique este tema.</div>
+    </div>
+    <button class="btn-primary" onclick="showScreen('ai')">Ir al Tutor IA</button>
+    <button class="btn-secondary" onclick="showScreen('lessons')">Volver</button>
+  `;
+  showScreen('lesson-detail');
+  markTask('t1');
+  state.lessonsDown = Math.min(state.lessonsDown + 1, 120);
+  state.progress = Math.min(100, state.progress + 0.8);
+  saveState();
+}
+
+// ===== QUIZ =====
+function startQuiz(id) {
+  const bank = QUIZ_BANKS[id];
+  if (!bank) { alert('Quiz no disponible aún.'); return; }
+  currentQuiz = { questions: bank, idx:0, score:0, id };
+  document.getElementById('quizTitle').textContent = MODULES.find(m=>m.id===id)?.title || 'Evaluación';
+  renderQuizQuestion();
+  showScreen('quiz');
+  markTask('t3');
+}
+
+function renderQuizQuestion() {
+  const q = currentQuiz.questions[currentQuiz.idx];
+  const total = currentQuiz.questions.length;
+  // Progress dots
+  let dots = '';
+  for(let i=0;i<total;i++) {
+    dots += `<div class="qp-dot ${i<currentQuiz.idx?'done':i===currentQuiz.idx?'current':''}"></div>`;
+  }
+  document.getElementById('quizProgress').innerHTML = dots;
+  document.getElementById('quizContent').innerHTML = `
+    <div class="question-card">
+      <div class="question-num">Pregunta ${currentQuiz.idx+1} de ${total}</div>
+      <div class="question-text">${q.q}</div>
+    </div>
+    <div class="options">
+      ${q.opts.map((o,i)=>`<button class="option-btn" id="opt${i}" onclick="selectAnswer(${i})">${o}</button>`).join('')}
+    </div>
+  `;
+}
+
+function selectAnswer(idx) {
+  const q = currentQuiz.questions[currentQuiz.idx];
+  document.querySelectorAll('.option-btn').forEach(b => b.onclick = null);
+  const correct = idx === q.ans;
+  document.getElementById('opt'+idx).classList.add(correct?'correct':'wrong');
+  if (!correct) document.getElementById('opt'+q.ans).classList.add('correct');
+  if (correct) currentQuiz.score++;
+  const fb = document.createElement('div');
+  fb.className = 'feedback-box';
+  fb.innerHTML = `${correct?'✅ Correcto!':'❌ Incorrecto.'} <br/>${q.exp}`;
+  document.querySelector('.options').after(fb);
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'btn-primary';
+  const isLast = currentQuiz.idx === currentQuiz.questions.length - 1;
+  nextBtn.textContent = isLast ? 'Ver resultados →' : 'Siguiente →';
+  nextBtn.onclick = isLast ? finishQuiz : nextQuestion;
+  fb.after(nextBtn);
+}
+
+function nextQuestion() {
+  currentQuiz.idx++;
+  renderQuizQuestion();
+}
+
+function finishQuiz() {
+  const total = currentQuiz.questions.length;
+  const pct = Math.round((currentQuiz.score / total) * 100);
+  state.scores.push(pct);
+  state.progress = Math.min(100, state.progress + 1.2);
+  saveState();
+  document.getElementById('quizContent').innerHTML = `
+    <div style="text-align:center;padding:32px 0;">
+      <div style="font-size:3rem;margin-bottom:12px;">${pct>=80?'🎉':pct>=60?'👍':'📚'}</div>
+      <div class="score-badge">${pct}%</div>
+      <div style="font-size:0.9rem;color:var(--text2);margin-bottom:24px;">
+        ${currentQuiz.score} de ${total} correctas
+      </div>
+      <div class="tip-card">
+        <strong>${pct>=80?'¡Excelente trabajo!':pct>=60?'Buen progreso, sigue practicando.':'Revisa la lección y vuelve a intentarlo.'}</strong><br/>
+        ${pct<80?'Recuerda usar el Tutor IA para aclarar dudas sobre este tema.':'Este módulo está dominado. Pasa al siguiente nivel.'}
+      </div>
+      <button class="btn-primary" onclick="showScreen('lessons')" style="margin-top:12px;">Continuar</button>
+      <button class="btn-secondary" onclick="startQuiz('${currentQuiz.id}')">Repetir evaluación</button>
+    </div>
+  `;
+}
+
+// ===== VOCAB =====
+let vocabCardFlipped = false;
+function renderVocab() {
+  const card = VOCAB_DECK[state.vocabIdx % VOCAB_DECK.length];
+  document.getElementById('vcWord').textContent = card.word;
+  document.getElementById('vcPhon').textContent = card.phon;
+  document.getElementById('vcDef').textContent = card.def;
+  document.getElementById('vcEx').textContent = card.ex;
+  document.getElementById('vocabCounter').textContent = `Tarjeta ${(state.vocabIdx % VOCAB_DECK.length)+1} de ${VOCAB_DECK.length}`;
+  document.getElementById('vocabScore').textContent = `Conocidas: ${state.vocabGood} | Difíciles: ${state.vocabBad}`;
+  document.getElementById('vocabCard').classList.remove('flipped');
+  vocabCardFlipped = false;
+}
+
+function flipCard() {
+  document.getElementById('vocabCard').classList.toggle('flipped');
+  vocabCardFlipped = !vocabCardFlipped;
+}
+
+function rateCard(rating) {
+  if (rating === 'good') { state.vocabGood++; state.wordsLearned = Math.min(2000, state.wordsLearned+1); }
+  else if (rating === 'bad') state.vocabBad++;
+  state.vocabIdx++;
+  state.progress = Math.min(100, state.progress + 0.3);
+  saveState();
+  renderVocab();
+  markTask('t2');
+}
+
+// ===== AI CHAT =====
+const AI_PROMPTS = {
+  conversation: `You are an expert English tutor helping a B1 student reach C1 level. Have natural conversations in English, gently correct mistakes, explain grammar when needed, and provide Spanish translations when helpful. Be encouraging and pedagogical. Keep responses concise (3-4 sentences max unless explaining). Current focus: advanced grammar, academic vocabulary, and natural expression.`,
+  grammar: `You are an English grammar checker and tutor. When the user writes text in English, analyze it for grammar, vocabulary, style, and naturalness errors. Provide: 1) Corrected version, 2) List of changes with explanations, 3) Suggestions to make it more natural/advanced (B2-C1 level). Be specific and educational.`,
+  writing: `You are a writing coach helping a B1 student develop C1-level writing skills. Guide them through essay structure, formal register, advanced vocabulary, cohesion devices, and argumentation. Give specific feedback and model sentences. Topics: academic essays, reports, formal emails.`,
+  exam: `You are simulating a Cambridge C1 Advanced (CAE) exam examiner. Give the student exam-style tasks: reading questions, use of English exercises, writing prompts. Evaluate responses with detailed feedback including grammar (20%), vocabulary (20%), coherence (20%), task achievement (20%), register (20%).`,
+};
+
+function initChat() {
+  const welcome = {
+    conversation: "Hello! I'm your AI English tutor. I'm here to help you go from B1 to C1. Let's practice! What would you like to talk about today, or do you have any grammar questions? 😊",
+    grammar: "¡Hola! Paste any text in English and I'll check it for grammar, vocabulary, and style errors, giving you B2-C1 level improvements.",
+    writing: "Welcome to Writing Coach mode! I'll help you develop C1-level academic writing. Would you like to work on an essay, a formal email, or a report?",
+    exam: "Welcome to C1 Exam Simulation! I'll give you Cambridge CAE-style exercises. Ready to start? Let's begin with a Use of English task: Fill in the gap — 'The new policy aims to ___ the gap between urban and rural communities.' Options: A) bridge B) fill C) extend D) widen",
+  };
+  chatHistory = [];
+  const msgs = document.getElementById('chatMessages');
+  msgs.innerHTML = '';
+  addAIMessage(welcome[aiMode]);
+}
+
+function setAIMode(mode, btn) {
+  aiMode = mode;
+  document.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  initChat();
+}
+
+function addAIMessage(text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.innerHTML = `<div class="msg-bubble">${text.replace(/\n/g,'<br/>')}</div><div class="msg-meta">Tutor IA</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg user';
+  div.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-meta">Tú</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showThinking() {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ai'; div.id = 'thinking';
+  div.innerHTML = `<div class="msg-bubble"><div class="thinking-dots"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeThinking() {
+  const el = document.getElementById('thinking');
+  if (el) el.remove();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  document.getElementById('chatSendBtn').disabled = true;
+  addUserMessage(text);
+  chatHistory.push({ role:'user', content: text });
+  showThinking();
+  markTask('t4');
+
+  try {
+    const GEMINI_KEY = 'AIzaSyB69jVOA0yMcrwFo2y27BFjCys8GDp0uzY';
+    const geminiMessages = chatHistory.map(function(m) {
+      return {
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      };
+    });
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: AI_PROMPTS[aiMode] }] },
+        contents: geminiMessages,
+        generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
+      })
+    });
+    const data = await resp.json();
+    removeThinking();
+    if (!resp.ok) {
+      addAIMessage('Error ' + resp.status + ': ' + (data && data.error ? data.error.message : 'Unknown error'));
+      document.getElementById('chatSendBtn').disabled = false;
+      return;
+    }
+    var reply = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] ? data.candidates[0].content.parts[0].text : '(empty response)';
+    chatHistory.push({ role:'assistant', content: reply });
+    addAIMessage(reply);
+  } catch(e) {
+    removeThinking();
+    addAIMessage('Error: ' + e.message);
+  }
+  document.getElementById('chatSendBtn').disabled = false;
+}
+// ===== PROFILE =====
+function renderProfile() {
+  const achievements = [
+    { icon:'🔥', label:'Racha', val: state.streak + ' días' },
+    { icon:'📖', label:'Palabras', val: state.wordsLearned },
+    { icon:'🎯', label:'Precisión', val: state.scores.length ? Math.round(state.scores.reduce((a,b)=>a+b,0)/state.scores.length)+'%' : '—' },
+    { icon:'📚', label:'Lecciones', val: state.lessonsDown },
+    { icon:'⏱️', label:'Horas est.', val: Math.round(state.lessonsDown * 0.5) },
+    { icon:'🏆', label:'Progreso', val: Math.round(state.progress)+'%' },
+  ];
+  document.getElementById('achievements').innerHTML = achievements.map(a => `
+    <div class="ach-card">
+      <div class="ach-icon">${a.icon}</div>
+      <div class="ach-val">${a.val}</div>
+      <div class="ach-label">${a.label}</div>
+    </div>
+  `).join('');
+
+  const hist = document.getElementById('evalHistory');
+  if (!state.scores.length) { hist.innerHTML = '<div style="color:var(--text2);font-size:0.85rem;">No hay evaluaciones aún.</div>'; return; }
+  hist.innerHTML = state.scores.slice(-8).reverse().map((s,i) => `
+    <div class="task-item">
+      <div class="task-text">Evaluación #${state.scores.length - i}</div>
+      <div style="font-family:var(--font-display);font-weight:700;color:${s>=80?'var(--accent3)':s>=60?'var(--gold)':'var(--accent2)'};">${s}%</div>
+    </div>
+  `).join('');
+}
+
+// ===== TASK MARK =====
+function markTask(id) {
+  if (!state.doneTasks.includes(id)) {
+    state.doneTasks.push(id);
+    saveState();
+    renderTasks();
+  }
+}
+
+// ===== SCREEN ROUTER =====
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const scr = document.getElementById('screen-' + name);
+  if (scr) scr.classList.add('active');
+  const bn = document.getElementById('bn-' + name);
+  if (bn) bn.classList.add('active');
+  if (name === 'home') { renderDashboard(); document.querySelectorAll('.nav-tab')[0].classList.add('active'); }
+  if (name === 'lessons') document.querySelectorAll('.nav-tab')[1].classList.add('active');
+  if (name === 'ai') { document.querySelectorAll('.nav-tab')[2].classList.add('active'); }
+  if (name === 'vocab') renderVocab();
+  if (name === 'profile') renderProfile();
+  window.scrollTo(0,0);
+}
+
+// ===== START =====
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
