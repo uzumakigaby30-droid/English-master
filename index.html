@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#080810"/>
+<link rel="manifest" href="manifest.json"/>
+<title>EnglishMaster Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080810;--bg2:#0f0f1c;--bg3:#161628;--bg4:#1e1e35;
+  --accent:#6c63ff;--a2:#ff6584;--a3:#43e97b;--gold:#f9c846;
+  --text:#eeeef8;--t2:#7878a0;--t3:#4a4a6a;
+  --border:rgba(255,255,255,0.06);
+  --r:16px;
+  --ff:'Syne',sans-serif;--fb:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
+
+/* ─── LOADER ─── */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.ll{font-family:var(--ff);font-size:2.4rem;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,var(--accent) 0%,var(--a2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.lb{width:200px;height:2px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.lf{height:100%;background:linear-gradient(90deg,var(--accent),var(--a2));animation:ld 2s ease forwards}
+@keyframes ld{from{width:0}to{width:100%}}
+.lt{font-size:.75rem;color:var(--t2);letter-spacing:.08em;text-transform:uppercase}
+
+/* ─── NAV ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(8,8,16,.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.nlogo{font-family:var(--ff);font-size:1.05rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nright{display:flex;align-items:center;gap:8px}
+.npill{display:flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;font-size:.72rem;font-family:var(--ff);font-weight:600}
+.npill.streak{background:rgba(249,200,70,.08);border:1px solid rgba(249,200,70,.2);color:var(--gold)}
+.npill.xp{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);color:var(--accent)}
+
+/* ─── BOTTOM NAV ─── */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;background:rgba(8,8,16,.96);backdrop-filter:blur(24px);border-top:1px solid var(--border);padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--t2);font-family:var(--fb);font-size:.58rem;cursor:pointer;padding:6px;transition:all .2s;letter-spacing:.03em}
+.bn .ico{font-size:1.2rem;transition:transform .2s}
+.bn.active{color:var(--accent)}
+.bn.active .ico{transform:scale(1.2)}
+
+/* ─── SCREENS ─── */
+.screen{display:none;padding:70px 16px 88px;max-width:760px;margin:0 auto;animation:fadeup .3s ease}
+.screen.active{display:block}
+@keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ─── TYPOGRAPHY ─── */
+.ptitle{font-family:var(--ff);font-size:clamp(1.5rem,5vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px}
+.psub{color:var(--t2);font-size:.85rem;margin-bottom:22px;line-height:1.65}
+.slabel{font-size:.65rem;text-transform:uppercase;letter-spacing:.14em;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.slabel::before{content:'';width:14px;height:2px;background:var(--accent);border-radius:1px}
+
+/* ─── CARDS ─── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:all .25s}
+.card:hover{border-color:rgba(108,99,255,.25);transform:translateY(-2px)}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:11px;cursor:pointer;font-family:var(--fb);font-weight:500;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff;padding:13px 24px;font-size:.9rem;width:100%}
+.btn-primary:hover{background:#7d74ff;transform:translateY(-1px);box-shadow:0 8px 24px rgba(108,99,255,.3)}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border);padding:11px 20px;font-size:.86rem;width:100%;margin-top:8px}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:8px 14px;font-size:.78rem;border-radius:8px}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--t2);padding:8px 14px;font-size:.78rem;border-radius:8px;font-family:var(--fb);cursor:pointer;transition:all .2s}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(255,101,132,.1);border:1px solid rgba(255,101,132,.25);color:var(--a2);padding:8px 14px;font-size:.78rem;border-radius:8px;cursor:pointer;font-family:var(--fb);transition:all .2s}
+
+/* ─── PROGRESS ─── */
+.prog-wrap{margin-bottom:20px}
+.prog-header{display:flex;justify-content:space-between;font-size:.75rem;color:var(--t2);margin-bottom:6px}
+.prog-track{height:5px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--a2));border-radius:99px;transition:width 1s ease}
+
+/* ─── STATS ─── */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.sc .sv{font-family:var(--ff);font-size:1.8rem;font-weight:700}
+.sc .sl{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--t2);margin-bottom:3px}
+.sc .ss{font-size:.7rem;color:var(--t2);margin-top:2px}
+
+/* ─── WEEK ─── */
+.week-row{display:flex;gap:5px;margin-bottom:20px}
+.wday{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 4px;font-size:.6rem;color:var(--t2)}
+.wday .wd{font-family:var(--ff);font-weight:700;font-size:.78rem;color:var(--text)}
+.wday.today{border-color:var(--accent);background:rgba(108,99,255,.07)}
+.wday.done .wm{color:var(--a3)}
+
+/* ─── TASKS ─── */
+.task-list{display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.task-item{display:flex;align-items:center;gap:11px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:13px 15px;cursor:pointer;transition:all .2s}
+.task-item:hover{border-color:rgba(108,99,255,.25)}
+.task-item.done{opacity:.4}
+.tcheck{width:22px;height:22px;border-radius:50%;border:2px solid var(--t3);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;transition:all .2s}
+.task-item.done .tcheck{background:var(--a3);border-color:var(--a3);color:#000}
+.ttext{flex:1;font-size:.84rem}
+.tdur{font-size:.68rem;color:var(--t2)}
+.tico{font-size:1.05rem;flex-shrink:0}
+
+/* ─── MODULES ─── */
+.mods-grid{display:flex;flex-direction:column;gap:9px}
+.mod-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:15px 17px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.mod-card:hover{border-color:rgba(108,99,255,.3);transform:translateY(-1px)}
+.mod-ico{font-size:1.7rem;width:42px;text-align:center;flex-shrink:0}
+.mod-info h3{font-family:var(--ff);font-size:.88rem;font-weight:700;margin-bottom:2px}
+.mod-info p{font-size:.72rem;color:var(--t2)}
+.mod-tag{font-size:.6rem;font-weight:700;padding:3px 8px;border-radius:20px;flex-shrink:0;font-family:var(--ff)}
+.tag-b1{background:rgba(67,233,123,.1);color:var(--a3)}
+.tag-b2{background:rgba(108,99,255,.14);color:var(--accent)}
+.tag-c1{background:rgba(255,101,132,.1);color:var(--a2)}
+
+/* ─── LESSON ─── */
+.lhdr{display:flex;align-items:center;gap:11px;margin-bottom:18px}
+.back-btn{background:var(--bg2);border:1px solid var(--border);border-radius:9px;color:var(--t2);padding:7px 13px;cursor:pointer;font-size:.8rem;font-family:var(--fb);transition:all .2s}
+.back-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ltitle{font-family:var(--ff);font-size:1.05rem;font-weight:700}
+.lesson-body{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:16px;line-height:1.8}
+.lesson-body h2{font-family:var(--ff);font-size:.98rem;color:var(--accent);margin-bottom:9px;margin-top:16px}
+.lesson-body h2:first-child{margin-top:0}
+.lesson-body p{color:var(--t2);font-size:.85rem;margin-bottom:9px}
+.lesson-body ul{padding-left:18px;color:var(--t2);font-size:.85rem}
+.lesson-body li{margin-bottom:5px}
+.hl{color:var(--text);background:rgba(108,99,255,.12);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:.9em}
+.ex-box{background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:11px 15px;margin:11px 0;font-size:.85rem;font-style:italic;color:var(--text)}
+
+/* ─── QUIZ ─── */
+.quiz-prog{display:flex;gap:3px;margin-bottom:20px}
+.qp{flex:1;height:3px;border-radius:2px;background:var(--bg3);transition:all .3s}
+.qp.done{background:var(--a3)}
+.qp.cur{background:var(--accent)}
+.q-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:12px}
+.q-num{font-size:.67rem;color:var(--t2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+.q-text{font-family:var(--ff);font-size:1rem;font-weight:700;line-height:1.45}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.opt{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:12px 17px;text-align:left;cursor:pointer;font-family:var(--fb);font-size:.84rem;color:var(--text);transition:all .2s;display:flex;align-items:center;gap:9px}
+.opt:hover{border-color:var(--accent);background:rgba(108,99,255,.05)}
+.opt.correct{background:rgba(67,233,123,.07);border-color:var(--a3);color:var(--a3)}
+.opt.wrong{background:rgba(255,101,132,.07);border-color:var(--a2);color:var(--a2)}
+.opt-l{width:24px;height:24px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0}
+.feedback{background:var(--bg3);border-radius:10px;padding:13px 15px;font-size:.82rem;color:var(--t2);line-height:1.65;border-left:3px solid var(--accent);margin-bottom:12px}
+.result-card{text-align:center;padding:32px 20px}
+.r-emoji{font-size:3rem;margin-bottom:10px}
+.r-score{font-family:var(--ff);font-size:3.2rem;font-weight:800;color:var(--a3);margin-bottom:5px}
+.r-msg{font-size:.87rem;color:var(--t2);margin-bottom:20px}
+
+/* ─── FILL IN BLANK ─── */
+.fib-sentence{font-size:.95rem;line-height:2.4;margin-bottom:14px}
+.fib-input{background:none;border:none;border-bottom:2px solid var(--accent);color:var(--accent);font-family:var(--fb);font-size:.95rem;width:130px;text-align:center;outline:none;padding:2px 4px;transition:all .2s}
+.fib-input.correct{border-color:var(--a3);color:var(--a3)}
+.fib-input.wrong{border-color:var(--a2);color:var(--a2)}
+.fib-input:disabled{cursor:default}
+.hint-tag{font-size:.65rem;color:var(--t2);background:var(--bg3);padding:2px 7px;border-radius:20px;margin-left:4px}
+
+/* ─── AUDIO PLAYER ─── */
+.audio-player{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+.audio-title{font-size:.78rem;color:var(--t2);margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.audio-controls{display:flex;align-items:center;gap:11px}
+.play-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.play-btn:hover{background:#7d74ff;transform:scale(1.05)}
+.play-btn.speaking{background:var(--a2)}
+.audio-pw{flex:1}
+.audio-prog{width:100%;height:4px;background:var(--bg4);border-radius:99px;cursor:pointer;-webkit-appearance:none;appearance:none;outline:none}
+.audio-prog::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer}
+.audio-time{font-size:.7rem;color:var(--t2);white-space:nowrap}
+.audio-speed{background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:.7rem;color:var(--t2);cursor:pointer;font-family:var(--fb)}
+.transcript-box{background:var(--bg4);border-radius:10px;padding:13px;font-size:.82rem;line-height:1.85;color:var(--t2);max-height:150px;overflow-y:auto;margin-top:11px}
+.transcript-box .w{cursor:pointer;padding:1px 2px;border-radius:3px;transition:background .15s}
+.transcript-box .w:hover{background:rgba(108,99,255,.18);color:var(--accent)}
+.transcript-box .w.hl2{background:rgba(108,99,255,.22);color:var(--accent)}
+
+/* ─── LISTEN FILL ─── */
+.listen-fill{background:var(--bg3);border-radius:12px;padding:16px;margin-top:12px}
+.listen-fill h4{font-family:var(--ff);font-size:.85rem;color:var(--accent);margin-bottom:12px}
+.lf-item{margin-bottom:14px;font-size:.87rem;line-height:2.2}
+.lf-input{background:none;border:none;border-bottom:2px solid var(--accent);color:var(--accent);font-family:var(--fb);font-size:.87rem;width:110px;text-align:center;outline:none;padding:2px 4px;transition:all .2s}
+.lf-input.correct{border-color:var(--a3);color:var(--a3)}
+.lf-input.wrong{border-color:var(--a2);color:var(--a2)}
+
+/* ─── WRITING ─── */
+.writing-prompt{background:linear-gradient(135deg,rgba(108,99,255,.08),rgba(255,101,132,.04));border:1px solid rgba(108,99,255,.18);border-radius:12px;padding:17px;margin-bottom:14px}
+.writing-prompt h3{font-family:var(--ff);font-size:.95rem;margin-bottom:7px;color:var(--accent)}
+.writing-prompt p{font-size:.83rem;color:var(--t2);line-height:1.6}
+.writing-area{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;color:var(--text);font-family:var(--fb);font-size:.86rem;resize:vertical;min-height:130px;outline:none;line-height:1.7;transition:border-color .2s;margin-bottom:9px}
+.writing-area:focus{border-color:var(--accent)}
+.wcount{font-size:.7rem;color:var(--t2);text-align:right;margin-bottom:11px}
+.writing-fb{background:var(--bg3);border-radius:12px;padding:15px;font-size:.82rem;line-height:1.7;color:var(--t2);margin-bottom:13px;border-top:2px solid var(--accent)}
+.writing-fb .corrected{color:var(--a3);background:rgba(67,233,123,.07);padding:7px 11px;border-radius:8px;margin:7px 0;font-style:italic}
+.writing-fb .error{color:var(--a2)}
+.writing-fb .good{color:var(--a3)}
+.key-phrases{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.kp{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:.72rem;color:var(--t2);cursor:pointer;transition:all .2s}
+.kp:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── SPEAKING ─── */
+.speak-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.speak-card h3{font-family:var(--ff);font-size:1rem;color:var(--accent);margin-bottom:12px}
+.speak-prompt{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(255,101,132,.05));border:1px solid rgba(108,99,255,.2);border-radius:12px;padding:16px;margin-bottom:16px}
+.speak-prompt p{font-size:.9rem;line-height:1.7;color:var(--text)}
+.speak-tips{margin-bottom:16px}
+.speak-tips li{font-size:.8rem;color:var(--t2);margin-bottom:5px;padding-left:4px}
+.rec-area{display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px 0}
+.rec-btn{width:72px;height:72px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.6rem;transition:all .3s;position:relative}
+.rec-btn.idle{background:var(--accent);box-shadow:0 0 0 0 rgba(108,99,255,.4)}
+.rec-btn.recording{background:var(--a2);animation:pulse 1s infinite}
+.rec-btn.done{background:var(--a3)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,101,132,.5)}70%{box-shadow:0 0 0 16px rgba(255,101,132,0)}100%{box-shadow:0 0 0 0 rgba(255,101,132,0)}}
+.rec-status{font-size:.78rem;color:var(--t2);text-align:center}
+.speak-transcript{background:var(--bg3);border-radius:10px;padding:13px;font-size:.84rem;color:var(--text);line-height:1.65;min-height:60px;margin-bottom:12px;border:1px solid var(--border)}
+.speak-score{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.s-score-pill{flex:1;min-width:70px;background:var(--bg3);border-radius:10px;padding:10px 8px;text-align:center}
+.s-score-pill .spv{font-family:var(--ff);font-size:1.3rem;font-weight:700}
+.s-score-pill .spl{font-size:.6rem;color:var(--t2);text-transform:uppercase;letter-spacing:.08em}
+
+/* ─── VOCAB ─── */
+.vc-wrap{perspective:800px;margin-bottom:16px;cursor:pointer}
+.vc{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:20px;min-height:200px;display:flex;align-items:center;justify-content:center;padding:26px;transition:transform .5s;transform-style:preserve-3d;position:relative}
+.vc.flipped{transform:rotateY(180deg)}
+.vc-front,.vc-back{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px;backface-visibility:hidden;text-align:center}
+.vc-back{transform:rotateY(180deg)}
+.vc-word{font-family:var(--ff);font-size:2rem;font-weight:800;margin-bottom:5px}
+.vc-phon{color:var(--t2);font-size:.82rem;margin-bottom:5px}
+.vc-type{font-size:.67rem;background:rgba(108,99,255,.13);color:var(--accent);padding:2px 9px;border-radius:20px;margin-bottom:7px}
+.vc-hint{font-size:.72rem;color:var(--t2)}
+.vc-def{font-size:.9rem;line-height:1.6;margin-bottom:8px}
+.vc-ex{font-style:italic;color:var(--t2);font-size:.8rem;line-height:1.5}
+.vc-syn{font-size:.72rem;color:var(--accent);margin-top:7px}
+.vc-nav{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.vc-btn{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:9px 17px;color:var(--text);cursor:pointer;font-family:var(--fb);font-size:.8rem;transition:all .2s}
+.vc-btn.easy{border-color:var(--a3);color:var(--a3)}
+.vc-btn.hard{border-color:var(--a2);color:var(--a2)}
+.vc-counter{text-align:center;font-size:.75rem;color:var(--t2);margin-bottom:14px}
+
+/* ─── AI CHAT ─── */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 190px);min-height:300px}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:9px;padding:4px 0;margin-bottom:9px}
+.msg{max-width:88%;animation:fadeup .3s ease}
+.msg.user{align-self:flex-end}
+.msg.ai{align-self:flex-start}
+.msg-bubble{padding:11px 15px;border-radius:15px;font-size:.85rem;line-height:1.65;white-space:pre-wrap}
+.msg.user .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:3px}
+.msg.ai .msg-bubble{background:var(--bg3);border:1px solid var(--border);border-bottom-left-radius:3px}
+.msg-meta{font-size:.6rem;color:var(--t2);margin-top:3px;padding:0 3px}
+.msg.user .msg-meta{text-align:right}
+.chat-row{display:flex;gap:7px;align-items:flex-end}
+.chat-in{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:10px 15px;color:var(--text);font-family:var(--fb);font-size:.85rem;resize:none;outline:none;max-height:100px;line-height:1.5;transition:border-color .2s}
+.chat-in:focus{border-color:var(--accent)}
+.chat-send{background:var(--accent);border:none;border-radius:11px;width:42px;height:42px;color:#fff;cursor:pointer;font-size:1.05rem;transition:all .2s;flex-shrink:0}
+.chat-send:hover{background:#7d74ff}
+.chat-send:disabled{opacity:.4;cursor:not-allowed}
+.chat-mic{background:var(--bg3);border:1px solid var(--border);border-radius:11px;width:42px;height:42px;color:var(--t2);cursor:pointer;font-size:1.05rem;transition:all .2s;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.chat-mic:hover{border-color:var(--a2);color:var(--a2)}
+.chat-mic.active{background:var(--a2);border-color:var(--a2);color:#fff;animation:pulse 1s infinite}
+.dots{display:flex;gap:4px;padding:2px 0}
+.dots span{width:5px;height:5px;border-radius:50%;background:var(--t2);animation:bk 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bk{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* ─── MODE TABS ─── */
+.mtabs{display:flex;gap:5px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px}
+.mtab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.74rem;color:var(--t2);cursor:pointer;white-space:nowrap;transition:all .2s;font-family:var(--fb)}
+.mtab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.itabs{display:flex;gap:5px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px}
+.itab{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.73rem;color:var(--t2);cursor:pointer;white-space:nowrap;font-family:var(--fb);transition:all .2s}
+.itab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ─── PROFILE ─── */
+.profile-hero{background:linear-gradient(135deg,rgba(108,99,255,.13),rgba(255,101,132,.06));border:1px solid rgba(108,99,255,.18);border-radius:20px;padding:22px;text-align:center;margin-bottom:18px}
+.p-av{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin:0 auto 10px}
+.p-name{font-family:var(--ff);font-size:1.2rem;font-weight:800;margin-bottom:2px}
+.p-level{font-size:.8rem;color:var(--t2)}
+.ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.ach{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 7px;text-align:center}
+.ach .ai{font-size:1.3rem;margin-bottom:2px}
+.ach .av{font-family:var(--ff);font-size:.95rem;font-weight:700}
+.ach .al{font-size:.6rem;color:var(--t2)}
+
+/* ─── BADGES ─── */
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 12px;font-size:.72rem;font-weight:600}
+.badge-accent{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.22);color:var(--accent)}
+.badge-gold{background:rgba(249,200,70,.08);border:1px solid rgba(249,200,70,.18);color:var(--gold)}
+.badge-green{background:rgba(67,233,123,.08);border:1px solid rgba(67,233,123,.18);color:var(--a3)}
+
+/* ─── TIP BOX ─── */
+.tip-box{background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.15);border-radius:10px;padding:12px 14px;font-size:.8rem;color:var(--t2);line-height:1.6;margin-bottom:13px}
+.tip-box strong{color:var(--text)}
+
+/* ─── LISTEN CARD ─── */
+.listen-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.listen-card h3{font-family:var(--ff);font-size:.95rem;margin-bottom:12px;color:var(--accent)}
+.listen-qs{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.listen-q{font-size:.84rem;margin-bottom:5px;color:var(--text)}
+
+/* ─── EXERCISE COUNTER ─── */
+.ex-counter{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.ex-counter .ec-label{font-family:var(--ff);font-size:.78rem;color:var(--t2)}
+.ex-counter .ec-dots{display:flex;gap:4px}
+.ec-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .3s}
+.ec-dot.done{background:var(--a3)}
+.ec-dot.cur{background:var(--accent)}
+
+/* ─── TTS BUTTON ─── */
+.tts-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:.72rem;color:var(--t2);cursor:pointer;font-family:var(--fb);transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+.tts-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tts-btn.speaking{border-color:var(--a2);color:var(--a2);background:rgba(255,101,132,.07)}
+
+/* ─── SPEAKING EXERCISE ─── */
+.output-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(67,233,123,.12),rgba(108,99,255,.08));border:1px solid rgba(67,233,123,.2);border-radius:20px;padding:5px 13px;font-size:.72rem;color:var(--a3);font-family:var(--ff);font-weight:600;margin-bottom:14px}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:420px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .vc-word{font-size:1.7rem}
+  .speak-score{gap:5px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ll">EnglishMaster Pro</div>
+  <div class="lb"><div class="lf"></div></div>
+  <div class="lt">Cargando tu plan B1 → C1...</div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nlogo">EnglishMaster Pro</div>
+  <div class="nright">
+    <div class="npill streak">🔥 <span id="sStreak">0</span></div>
+    <div class="npill xp">⚡ <span id="sXP">0</span> XP</div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="screen active" id="sc-home">
+  <div class="output-badge">🗣️ Output-First Learning · Habla más, aprende más rápido</div>
+  <div class="ptitle">Bienvenido de vuelta</div>
+  <div class="psub">El secreto del C1: más speaking y writing que reading. Cada día importa.</div>
+  <div class="prog-wrap">
+    <div class="prog-header"><span>Progreso B1 → C1</span><span id="hPct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="hFill" style="width:0%"></div></div>
+  </div>
+  <div class="slabel">Esta semana</div>
+  <div class="week-row" id="weekRow"></div>
+  <div class="stats-grid">
+    <div class="sc"><div class="sl">Palabras</div><div class="sv" id="hWords">0</div><div class="ss">de 2500 objetivo</div></div>
+    <div class="sc"><div class="sl">Lecciones</div><div class="sv" id="hLessons">0</div><div class="ss">completadas</div></div>
+    <div class="sc"><div class="sl">Racha</div><div class="sv" id="hStreakN">0</div><div class="ss">días 🔥</div></div>
+    <div class="sc"><div class="sl">Promedio</div><div class="sv" id="hAvg">—</div><div class="ss">en evaluaciones</div></div>
+  </div>
+  <div class="slabel">Plan de hoy · 60 min</div>
+  <div class="task-list" id="todayList"></div>
+</div>
+
+<!-- LESSONS -->
+<div class="screen" id="sc-lessons">
+  <div class="ptitle">Módulos</div>
+  <div class="psub">Progresión completa B1 → B2 → C1</div>
+  <div class="itabs">
+    <button class="itab active" onclick="filterMods('all',this)">Todos</button>
+    <button class="itab" onclick="filterMods('grammar',this)">Gramática</button>
+    <button class="itab" onclick="filterMods('vocab',this)">Vocabulario</button>
+    <button class="itab" onclick="filterMods('listening',this)">Listening</button>
+    <button class="itab" onclick="filterMods('writing',this)">Writing</button>
+    <button class="itab" onclick="filterMods('speaking',this)">Speaking</button>
+  </div>
+  <div class="mods-grid" id="modGrid"></div>
+</div>
+
+<!-- LESSON DETAIL -->
+<div class="screen" id="sc-lesson">
+  <div class="lhdr"><button class="back-btn" onclick="goBack()">← Volver</button><div class="ltitle" id="lessonTitle"></div></div>
+  <div id="lessonContent"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="sc-quiz">
+  <div class="lhdr"><button class="back-btn" onclick="goBack()">← Salir</button><div class="ltitle" id="quizLabel">Evaluación</div></div>
+  <div class="quiz-prog" id="quizProg"></div>
+  <div id="quizContent"></div>
+</div>
+
+<!-- VOCAB -->
+<div class="screen" id="sc-vocab">
+  <div class="lhdr"><button class="back-btn" onclick="showScreen('lessons')">← Módulos</button><div class="ltitle">Vocabulario</div></div>
+  <div class="itabs">
+    <button class="itab active" onclick="setVocabMode('flash',this)">Flashcards</button>
+    <button class="itab" onclick="setVocabMode('fill',this)">Completar</button>
+    <button class="itab" onclick="setVocabMode('match',this)">Relacionar</button>
+  </div>
+  <div id="vocabContent"></div>
+</div>
+
+<!-- LISTEN -->
+<div class="screen" id="sc-listen">
+  <div class="lhdr"><button class="back-btn" onclick="goBack()">← Volver</button><div class="ltitle">Listening · 10 Ejercicios</div></div>
+  <div id="listenContent"></div>
+</div>
+
+<!-- WRITING -->
+<div class="screen" id="sc-writing">
+  <div class="lhdr"><button class="back-btn" onclick="goBack()">← Volver</button><div class="ltitle" id="writingTitle">Writing</div></div>
+  <div id="writingContent"></div>
+</div>
+
+<!-- SPEAKING -->
+<div class="screen" id="sc-speaking">
+  <div class="lhdr"><button class="back-btn" onclick="goBack()">← Volver</button><div class="ltitle">Speaking · Output First</div></div>
+  <div id="speakingContent"></div>
+</div>
+
+<!-- AI TUTOR -->
+<div class="screen" id="sc-ai">
+  <div class="ptitle">Tutor IA</div>
+  <div class="psub">Conversa, practica speaking con voz y recibe feedback inmediato.</div>
+  <div class="mtabs">
+    <button class="mtab active" onclick="setMode('conversation',this)">💬 Conversación</button>
+    <button class="mtab" onclick="setMode('grammar',this)">📝 Gramática</button>
+    <button class="mtab" onclick="setMode('writing',this)">✍️ Writing</button>
+    <button class="mtab" onclick="setMode('exam',this)">🎓 Examen</button>
+    <button class="mtab" onclick="setMode('pronunciation',this)">🗣️ Pronunciación</button>
+  </div>
+  <div class="chat-wrap">
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="chat-row">
+      <textarea class="chat-in" id="chatIn" rows="1" placeholder="Escribe o habla con el tutor..." onkeydown="onChatKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="chat-mic" id="chatMicBtn" onclick="toggleVoiceInput()" title="Hablar con voz">🎤</button>
+      <button class="chat-send" id="chatBtn" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div class="screen" id="sc-profile">
+  <div class="ptitle">Mi Perfil</div>
+  <div class="profile-hero">
+    <div class="p-av">🎓</div>
+    <div class="p-name" id="pName">Estudiante B1→C1</div>
+    <div class="p-level">Nivel actual: B1+ → objetivo C1</div>
+  </div>
+  <div class="slabel">Estadísticas</div>
+  <div class="ach-grid" id="achGrid"></div>
+  <div class="slabel">Historial de evaluaciones</div>
+  <div id="evalHist"></div>
+  <button class="btn btn-secondary" style="margin-top:16px" onclick="resetAll()">🗑️ Reiniciar progreso</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="bn active" id="bn-home" onclick="showScreen('home')"><div class="ico">🏠</div>Inicio</button>
+  <button class="bn" id="bn-lessons" onclick="showScreen('lessons')"><div class="ico">📚</div>Módulos</button>
+  <button class="bn" id="bn-speaking" onclick="showScreen('speaking')"><div class="ico">🗣️</div>Speaking</button>
+  <button class="bn" id="bn-ai" onclick="showScreen('ai')"><div class="ico">🤖</div>Tutor IA</button>
+  <button class="bn" id="bn-profile" onclick="showScreen('profile')"><div class="ico">👤</div>Perfil</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════
+
+const MODULES = [
+  {id:'g1',title:'Conditionals Avanzados',desc:'Types 2, 3 y Mixed',level:'B2',cat:'grammar',ico:'⚙️',lessons:4},
+  {id:'g2',title:'Modal Verbs Avanzados',desc:'Deduction, regret, formality',level:'B2',cat:'grammar',ico:'🔧',lessons:3},
+  {id:'g3',title:'Reported Speech',desc:'Backshift, reporting verbs',level:'B2',cat:'grammar',ico:'💬',lessons:3},
+  {id:'v1',title:'Vocabulario Académico',desc:'C1 Academic Word List',level:'C1',cat:'vocab',ico:'📖',lessons:4,special:'vocab'},
+  {id:'l1',title:'Listening: Work & Society',desc:'10 ejercicios con dictado',level:'B2',cat:'listening',ico:'🎧',lessons:10,special:'listen'},
+  {id:'l2',title:'Listening: Science & Tech',desc:'10 ejercicios avanzados',level:'C1',cat:'listening',ico:'🔬',lessons:10,special:'listen2'},
+  {id:'w1',title:'Writing: 10 Ejercicios',desc:'Emails, ensayos, reportes',level:'B2',cat:'writing',ico:'✍️',lessons:10,special:'writing'},
+  {id:'sp1',title:'Speaking: Opinión y Debate',desc:'10 ejercicios de output',level:'B2',cat:'speaking',ico:'🗣️',lessons:10,special:'speaking'},
+  {id:'sp2',title:'Speaking: Descripción',desc:'Imágenes, historias, datos',level:'C1',cat:'speaking',ico:'🖼️',lessons:10,special:'speaking2'},
+];
+
+const VOCAB_DECK = [
+  {word:'Mitigate',phon:'/ˈmɪtɪɡeɪt/',type:'verb',def:'Make less severe, serious, or painful.',ex:'"New regulations aim to mitigate the impact of climate change."',syn:'Sinónimos: alleviate, reduce, lessen'},
+  {word:'Corroborate',phon:'/kəˈrɒbəreɪt/',type:'verb',def:'Confirm or support a statement or theory with new information.',ex:'"The evidence corroborates the initial findings."',syn:'Sinónimos: confirm, support, verify'},
+  {word:'Pragmatic',phon:'/præɡˈmætɪk/',type:'adj.',def:'Dealing with things sensibly and realistically.',ex:'"We need a pragmatic approach to solve this issue."',syn:'Sinónimos: practical, realistic, sensible'},
+  {word:'Proliferate',phon:'/prəˈlɪfəreɪt/',type:'verb',def:'Increase rapidly in numbers; multiply.',ex:'"Social media platforms have proliferated in the last decade."',syn:'Sinónimos: multiply, spread, expand'},
+  {word:'Pervasive',phon:'/pəˈveɪsɪv/',type:'adj.',def:'Spreading widely throughout an area or a group.',ex:'"The influence of social media is pervasive in modern life."',syn:'Sinónimos: widespread, prevalent, ubiquitous'},
+  {word:'Scrutinize',phon:'/ˈskruːtɪnaɪz/',type:'verb',def:'Examine or inspect closely and thoroughly.',ex:'"The committee will scrutinize every aspect of the proposal."',syn:'Sinónimos: examine, inspect, analyze'},
+  {word:'Exacerbate',phon:'/ɪɡˈzæsəbeɪt/',type:'verb',def:'Make a problem or bad situation worse.',ex:'"The drought exacerbated the already dire food shortage."',syn:'Sinónimos: worsen, aggravate, intensify'},
+  {word:'Ramification',phon:'/ˌræmɪfɪˈkeɪʃən/',type:'noun',def:'A complex consequence of an action or event.',ex:'"The ramifications of this policy will be felt for years."',syn:'Sinónimos: consequence, implication, effect'},
+  {word:'Unprecedented',phon:'/ʌnˈpresɪdentɪd/',type:'adj.',def:'Never done or known before.',ex:'"The pandemic caused unprecedented disruption to the economy."',syn:'Sinónimos: unparalleled, unheard-of, unique'},
+  {word:'Juxtapose',phon:'/ˌdʒʌkstəˈpəʊz/',type:'verb',def:'Place close together for contrasting effect.',ex:'"The director juxtaposed images of wealth and poverty."',syn:'Sinónimos: contrast, compare, set side by side'},
+  {word:'Substantiate',phon:'/səbˈstænʃieɪt/',type:'verb',def:'Provide evidence to support or prove the truth of.',ex:'"Can you substantiate these claims with data?"',syn:'Sinónimos: prove, support, validate'},
+  {word:'Culminate',phon:'/ˈkʌlmɪneɪt/',type:'verb',def:'Reach a climax or point of highest development.',ex:'"Years of research culminated in a groundbreaking discovery."',syn:'Sinónimos: peak, result in, end in'},
+];
+
+const FIB_EXERCISES = [
+  {before:'The new policy aims to ',blank:'mitigate',after:' the environmental damage caused by industrial pollution.',hint:'less severe (mit...)'},
+  {before:'Her argument was well-researched and difficult to ',blank:'refute',after:' in the academic debate.',hint:'prove wrong (ref...)'},
+  {before:'The CEO made a ',blank:'pragmatic',after:' decision to cut costs rather than pursue the risky expansion.',hint:'sensible (prag...)'},
+  {before:'The results of the study ',blank:'corroborate',after:' the theory that exercise improves mental health.',hint:'confirm (cor...)'},
+  {before:'There are ',blank:'inherent',after:' risks in any new business venture that cannot be avoided.',hint:'built-in (inh...)'},
+  {before:'The discovery was truly ',blank:'unprecedented',after:' — nothing like it had ever been found before.',hint:'never before seen (unp...)'},
+  {before:'Social media has ',blank:'proliferated',after:' rapidly across all demographics in recent years.',hint:'multiplied fast (pro...)'},
+  {before:'We need to carefully ',blank:'scrutinize',after:' every clause in the contract before signing.',hint:'examine closely (scr...)'},
+  {before:'The drought has ',blank:'exacerbated',after:' the food crisis in the region.',hint:'made worse (exa...)'},
+  {before:'The policy change had serious ',blank:'ramifications',after:' for the entire industry.',hint:'complex consequences (ram...)'},
+];
+
+const MATCH_PAIRS = [
+  {word:'Nevertheless',match:'Sin embargo, a pesar de eso'},
+  {word:'Exacerbate',match:'Empeorar una situación'},
+  {word:'Proliferate',match:'Multiplicarse rápidamente'},
+  {word:'Scrutinize',match:'Examinar detalladamente'},
+  {word:'Ramification',match:'Consecuencia compleja'},
+  {word:'Pervasive',match:'Extendido, prevalente'},
+  {word:'Mitigate',match:'Reducir o aliviar algo'},
+  {word:'Corroborate',match:'Confirmar con evidencia'},
+];
+
+// 10 LISTENING EXERCISES (Track 1: Remote Work)
+const LISTEN_TRACKS = [
+  {
+    id:'t1',
+    title:'The Future of Remote Work',
+    level:'B2',
+    duration:'3:00',
+    text:`Remote work has fundamentally transformed the modern workplace. [pause] What began as an emergency response to the pandemic has evolved into a permanent fixture of professional life for millions of workers worldwide. [pause] Companies that once insisted on physical presence have been forced to reconsider their stance, as productivity data has consistently shown that many employees perform just as well, if not better, from home. [pause] However, the shift has not been without its challenges. Issues such as isolation, communication breakdowns, and the blurring of work-life boundaries have emerged as significant concerns. [pause] The most forward-thinking organizations are now adopting hybrid models that combine the flexibility of remote work with the collaborative benefits of in-person interaction. [pause] Research suggests that employees who work remotely at least part of the time report higher job satisfaction and are less likely to leave their employer. [pause] Critics, however, argue that remote work disadvantages younger employees who miss out on mentorship and informal learning opportunities that come naturally in an office environment. [pause] The debate ultimately comes down to trust: do managers believe their teams can be productive without direct supervision?`,
+    questions:[
+      {q:'What originally caused the shift to remote work?',opts:['Technology advances','The pandemic','Cost-cutting drives','Employee demand'],ans:1},
+      {q:'What has productivity data shown?',opts:['Remote workers are less productive','Performance is equal or better at home','Offices are always better','Data is inconclusive'],ans:1},
+      {q:'Which approach are forward-thinking organizations adopting?',opts:['Fully remote','Full office return','Hybrid models','Four-day weeks'],ans:2},
+      {q:'What do remote workers report about job satisfaction?',opts:['Lower satisfaction','Same as office workers','Higher satisfaction','It varies by role'],ans:2},
+      {q:'What disadvantage do critics highlight for younger workers?',opts:['Lower salaries','Loss of mentorship opportunities','Fewer promotions','Poor technology access'],ans:1},
+    ],
+    // Fill-in-the-blank from transcript
+    fillBlanks:[
+      {before:'Remote work has fundamentally ',blank:'transformed',after:' the modern workplace.',hint:'changed completely'},
+      {before:'What began as an emergency response to the ',blank:'pandemic',after:' has evolved into a permanent fixture.',hint:'COVID-19 crisis'},
+      {before:'Productivity data has consistently shown that employees perform just as ',blank:'well',after:', if not better, from home.',hint:'effectively'},
+      {before:'Issues such as isolation, communication breakdowns, and the blurring of ',blank:'work-life',after:' boundaries have emerged.',hint:'balance concept'},
+      {before:'Hybrid models combine the flexibility of remote work with the ',blank:'collaborative',after:' benefits of in-person interaction.',hint:'teamwork-related'},
+    ]
+  },
+  {
+    id:'t2',
+    title:'Climate Change and Urban Planning',
+    level:'C1',
+    duration:'3:30',
+    text:`Cities around the world are grappling with the unprecedented challenges posed by climate change. [pause] Urban planners are increasingly incorporating climate resilience into their designs, recognizing that the traditional approach to city development is no longer sustainable. [pause] From green roofs that absorb rainwater and reduce urban heat islands, to smart traffic systems that minimize vehicle emissions, the innovations being implemented are both creative and necessary. [pause] Singapore, often cited as a model of sustainable urban development, has invested heavily in vertical gardens and integrated water management systems. [pause] These measures have significantly reduced the city-state's carbon footprint while improving quality of life for residents. [pause] Copenhagen aims to become the world's first carbon-neutral capital by 2025, implementing an ambitious network of cycle lanes and green energy infrastructure. [pause] The question is no longer whether cities need to adapt, but how quickly and equitably they can implement the changes needed to protect all their inhabitants. [pause] Vulnerable communities often bear the greatest burden of climate change while having the fewest resources to adapt.`,
+    questions:[
+      {q:'What is the main challenge for modern urban planners?',opts:['Economic growth','Climate resilience','Population management','Tourism revenue'],ans:1},
+      {q:'What is Singapore cited as a model of?',opts:['Economic growth','Tourism','Sustainable urban development','Technology innovation'],ans:2},
+      {q:'What is Copenhagen\'s goal?',opts:['Largest city by 2025','Carbon-neutral by 2025','Carbon-neutral by 2030','Greenest park system'],ans:1},
+      {q:'Who bears the greatest burden of climate change?',opts:['Governments','Corporations','Vulnerable communities','Urban planners'],ans:2},
+      {q:'What do green roofs help reduce?',opts:['Traffic noise','Urban heat islands','Air pollution only','Building costs'],ans:1},
+    ],
+    fillBlanks:[
+      {before:'Cities are grappling with the unprecedented ',blank:'challenges',after:' posed by climate change.',hint:'difficulties'},
+      {before:'Urban planners are incorporating climate ',blank:'resilience',after:' into their designs.',hint:'ability to recover'},
+      {before:'Smart traffic systems minimize vehicle ',blank:'emissions',after:' in urban areas.',hint:'pollution output'},
+      {before:'Singapore has invested in vertical gardens and integrated water ',blank:'management',after:' systems.',hint:'control/handling'},
+      {before:'Vulnerable communities bear the greatest ',blank:'burden',after:' of climate change.',hint:'heavy weight/load'},
+    ]
+  }
+];
+
+// 10 WRITING EXERCISES
+const WRITING_PROMPTS = [
+  {id:'w1',title:'Opinion Essay',level:'B2',prompt:'Some people believe that social media has had an overwhelmingly negative effect on society. Others argue that its benefits outweigh its drawbacks. Discuss both views and give your opinion. (180-220 words)',tips:['Use formal language','Include intro, body, conclusion','Use: Furthermore, However, Nevertheless','Give specific examples','State your opinion clearly'],keyPhrases:['It is widely argued that...','On the one hand... On the other hand...','A key advantage is...','Despite this, it is worth noting...','In conclusion, it is my view that...']},
+  {id:'w2',title:'Formal Email',level:'B1',prompt:'You attended a conference by TechForward. Write a formal email to the organizer expressing your satisfaction, mentioning two things you enjoyed, and suggesting one improvement. (120-150 words)',tips:['Use: Dear Mr/Ms + surname','Use: I am writing to...','Avoid informality','Close: Yours sincerely'],keyPhrases:['I am writing to express my appreciation...','I was particularly impressed by...','One suggestion I would like to offer...','I look forward to attending future events']},
+  {id:'w3',title:'Report Writing',level:'C1',prompt:'Your company asked you to write a report on the feasibility of a four-day work week. Include benefits, challenges, and your recommendation. (200-250 words)',tips:['Use section headers','Write impersonally','Use passive voice','End with clear recommendations'],keyPhrases:['The purpose of this report is to...','Research indicates that...','Based on the findings, it is recommended that...']},
+  {id:'w4',title:'Letter of Complaint',level:'B2',prompt:'You bought a laptop online that arrived damaged. Write a formal complaint letter to the company requesting a replacement or refund. (150-180 words)',tips:['State the problem clearly','Be firm but polite','Mention what action you expect','Include reference details'],keyPhrases:['I am writing to express my dissatisfaction with...','Despite my expectations, the product...','I would appreciate it if you could...','I look forward to your prompt response']},
+  {id:'w5',title:'Article for Magazine',level:'C1',prompt:'Write an article for an educational magazine about whether artificial intelligence will replace teachers in the future. Use an engaging title and give a balanced view. (200-240 words)',tips:['Start with an engaging hook','Use a rhetorical question or surprising fact','Balance both sides','End with a thought-provoking conclusion'],keyPhrases:['Could AI really replace the human touch in education?','Proponents argue that...','Sceptics, however, point out...','The future likely lies somewhere in between...']},
+  {id:'w6',title:'Review',level:'B2',prompt:'Write a review of a book or film for an English-language website. Briefly summarize it, discuss its strengths and weaknesses, and recommend (or not) it to readers. (160-200 words)',tips:['Don\'t reveal spoilers','Use varied vocabulary for opinions','Back up opinions with evidence','Make a clear recommendation at the end'],keyPhrases:['The narrative revolves around...','Particularly noteworthy is...','One minor drawback is...','I would strongly recommend this to...']},
+  {id:'w7',title:'Discursive Essay',level:'C1',prompt:'To what extent do you agree that governments should invest more in space exploration rather than solving problems on Earth? Write a discursive essay. (220-260 words)',tips:['Acknowledge multiple perspectives','Use hedging language','Quote hypothetical statistics','Strong thesis in introduction'],keyPhrases:['While it is undeniable that...','Proponents of space investment contend that...','A compelling counter-argument is...','Ultimately, the evidence suggests...']},
+  {id:'w8',title:'Proposal',level:'C1',prompt:'Your college has budget to improve student wellbeing. Write a proposal suggesting two initiatives, explaining the benefits and how they could be implemented. (200-240 words)',tips:['Use professional headings','Write objectively','Include cost-benefit reasoning','Be specific about implementation'],keyPhrases:['The aim of this proposal is to...','It is suggested that...','This initiative would not only... but also...','In terms of implementation...']},
+  {id:'w9',title:'Informal Email',level:'B1',prompt:'Write an email to your English-speaking friend telling them about a recent trip you took. Describe what you did, a highlight, and something that went wrong. (130-160 words)',tips:['Use contractions','Start informally: Hi / Hey','Use narrative tenses','Include your feelings'],keyPhrases:['You won\'t believe what happened!','The highlight was definitely...','Unfortunately, things didn\'t go to plan when...','You absolutely have to visit someday!']},
+  {id:'w10',title:'Summary Writing',level:'C1',prompt:'Read the following extract and write a summary of the main arguments in 80-100 words, using your own words:\n\n"Automation is transforming the global economy at an unprecedented pace. Entire industries that once employed thousands of workers are being restructured around machines and algorithms. While this increases efficiency and reduces costs for businesses, it raises profound questions about employment, social inequality, and the role of government in managing the transition. Some economists argue for a universal basic income, while others suggest retraining programmes are the most viable solution."',tips:['Do NOT copy sentences verbatim','Identify the core arguments','Use linking words','Aim for 80-100 words'],keyPhrases:['The extract discusses...','The author highlights...','A key concern raised is...','Possible solutions mentioned include...']}
+];
+
+// 10 SPEAKING EXERCISES
+const SPEAKING_EXERCISES = [
+  {id:'sp1',title:'Opinion: Social Media',level:'B2',type:'opinion',prompt:'Do you think social media does more harm than good? Give your opinion with 2-3 specific reasons and examples. Speak for at least 60 seconds.',vocab:['On balance, I believe...','A compelling argument for this is...','Critics might argue, however...','Nevertheless, I maintain that...'],tips:['Start with your clear position','Use signposting language','Give real examples','End with a summary'],duration:60},
+  {id:'sp2',title:'Compare & Contrast',level:'B2',type:'compare',prompt:'Compare living in a big city versus living in a small town. Discuss lifestyle, opportunities, and quality of life. Speak for 60-90 seconds.',vocab:['In contrast to...','While city dwellers tend to...','Rural life, on the other hand...','The key distinction lies in...'],tips:['Use both/whereas/while','Cover multiple aspects','Balance both sides','Give personal opinion at end'],duration:75},
+  {id:'sp3',title:'Problem Solving',level:'B2',type:'problem',prompt:'Your city wants to reduce traffic congestion. Suggest three practical solutions and explain the pros and cons of each. Speak for 60-90 seconds.',vocab:['One viable solution would be...','The drawback of this approach is...','Alternatively, we could...','The most cost-effective option...'],tips:['Organize: solution → pros → cons','Be practical and realistic','Use hedging language','Prioritize your best idea'],duration:75},
+  {id:'sp4',title:'Speculating about the Future',level:'C1',type:'speculate',prompt:'How do you think the job market will change in the next 20 years due to AI and automation? What skills will be most valuable?',vocab:['It is conceivable that...','In all likelihood...','One can only speculate...','The trajectory suggests...'],tips:['Use future forms varied','Express degrees of certainty','Mention specific industries','Show critical thinking'],duration:90},
+  {id:'sp5',title:'Describing a Process',level:'B2',type:'describe',prompt:'Explain how you would go about learning a completely new skill from scratch. Walk through your approach step by step.',vocab:['To begin with, I would...','Subsequently...','Having done that, the next step...','The crucial phase is...'],tips:['Use clear sequencing words','Be specific and logical','Use would for hypothetical','Add personal tips/experience'],duration:60},
+  {id:'sp6',title:'Abstract Discussion',level:'C1',type:'abstract',prompt:'What does "success" mean to you? Has your definition changed over time? Is success individual or can it be collective?',vocab:['Conventionally defined as...','I would argue that the concept is subjective...','From a societal perspective...','My own understanding has evolved...'],tips:['Define the concept first','Explore different dimensions','Show philosophical thinking','Use complex structures'],duration:90},
+  {id:'sp7',title:'Debate Position',level:'C1',type:'debate',prompt:'Take the position AGAINST this statement and argue it convincingly: "University education should be free for everyone." You must argue this even if you personally disagree.',vocab:['The fiscal reality is that...','Free provision inevitably leads to...','The evidence from countries like...','A more equitable solution might be...'],tips:['Steel-man the opposing view','Use data and examples','Anticipate counter-arguments','Stay in character — argue the position'],duration:90},
+  {id:'sp8',title:'Narrative & Storytelling',level:'B2',type:'narrative',prompt:'Tell the story of a time when you had to overcome a significant challenge. Use narrative tenses and make it engaging. Aim for 60-90 seconds.',vocab:['At the time, I had been...','Looking back, I realize...','What struck me most was...','This experience taught me...'],tips:['Set the scene first','Use past perfect for background','Include your feelings','Reflect on what you learned'],duration:75},
+  {id:'sp9',title:'Impromptu Talk',level:'C1',type:'impromptu',prompt:'You have 30 seconds to prepare, then speak for 60 seconds on this topic: "The most important invention of the 21st century."',vocab:['Without doubt, the most significant...','Its impact can be seen in...','Before this existed, people...','Perhaps what is most remarkable is...'],tips:['Use preparation time to outline 2-3 points','Start with a bold claim','Give one detailed example','End with a wider implication'],duration:60,prepTime:30},
+  {id:'sp10',title:'Interview Simulation',level:'C1',type:'interview',prompt:'Answer this job interview question in fluent, professional English: "Can you describe a situation where you had to work under pressure and how you managed it?" Use the STAR technique (Situation, Task, Action, Result).',vocab:['In a previous role, I encountered...','My primary responsibility was to...','I decided to tackle this by...','As a direct result, we managed to...'],tips:['STAR: Situation → Task → Action → Result','Quantify results when possible','Be specific, not vague','Show self-awareness'],duration:90},
+];
+
+const QUIZ_BANKS = {
+  g1:[
+    {q:'If I ___ more money, I would travel the world.',opts:['have','had','would have','has'],ans:1,exp:'Second conditional: If + past simple, would + base verb. Hypothetical present/future.'},
+    {q:'By this time next year, she ___ her degree.',opts:['will finish','will have finished','has finished','is finishing'],ans:1,exp:'Future Perfect: action completed before a specific future time.'},
+    {q:'I wish I ___ speak Spanish as fluently as English.',opts:['can','could','would','will'],ans:1,exp:'"Wish + could" = desire for a present ability you don\'t have.'},
+    {q:'___ she studied harder, she might have passed.',opts:['If','Had','Should','Were'],ans:1,exp:'Inversion: "Had she studied" = "If she had studied". Formal register.'},
+    {q:'We\'d have arrived on time if the train ___ delayed.',opts:['wasn\'t','hadn\'t been','wouldn\'t be','isn\'t'],ans:1,exp:'Third conditional: past perfect in the if-clause.'},
+    {q:'If only I ___ more carefully — now the project is a mess.',opts:['planned','had planned','would plan','plan'],ans:1,exp:'"If only + past perfect" expresses regret about a past action.'},
+    {q:'___ you need any help, please don\'t hesitate to call.',opts:['If','Should','Had','Were'],ans:1,exp:'Inversion with "should" = formal "if you need". Common in business writing.'},
+    {q:'She spoke as though she ___ the president personally.',opts:['knows','known','knew','had known'],ans:2,exp:'"As though/as if + past simple" for unreal comparisons in the present.'},
+    {q:'It\'s high time we ___ this issue seriously.',opts:['take','took','had taken','are taking'],ans:1,exp:'"It\'s high time + past simple" = criticism that something should have happened already.'},
+    {q:'___ it not been for your help, we would have failed.',opts:['Had','Were','Should','If'],ans:0,exp:'"Had it not been for" = formal inversion of "If it hadn\'t been for". Common in C1 writing.'},
+  ],
+  g2:[
+    {q:'You ___ have told me earlier — I could have helped.',opts:['should','must','can','will'],ans:0,exp:'"Should have + past participle" = criticism/regret about past.'},
+    {q:'She ___ be at home — her car is in the driveway.',opts:['must','should','ought','can'],ans:0,exp:'"Must" = logical deduction (certainty) from evidence.'},
+    {q:'You ___ smoke in this area — it\'s strictly prohibited.',opts:['needn\'t','mustn\'t','shouldn\'t','mightn\'t'],ans:1,exp:'"Mustn\'t" = strong prohibition. "Needn\'t" = unnecessary (but allowed).'},
+    {q:'I ___ rather stay home than attend that meeting.',opts:['would','should','could','might'],ans:0,exp:'"Would rather + base verb" expresses preference.'},
+    {q:'They ___ not have received the email — there was a server error.',opts:['may','must','should','will'],ans:0,exp:'"May not have" = possibility that something didn\'t happen.'},
+    {q:'The report is due today. You ___ submit it by 5pm.',opts:['should','must','might','would'],ans:1,exp:'"Must" = obligation/requirement (stronger than "should").'},
+    {q:'___ to try again, what would you do differently?',opts:['Were you','Had you','Should you','Will you'],ans:0,exp:'"Were you to" = formal inversion of "If you were to". C1 structure.'},
+    {q:'She ___ have known about the merger — she was on the board.',opts:['must','should','could','may'],ans:0,exp:'"Must have known" = strong deduction about a past situation.'},
+    {q:'I ___ have worried so much — everything turned out fine.',opts:['needn\'t','mustn\'t','shouldn\'t','couldn\'t'],ans:0,exp:'"Needn\'t have + past participle" = did something unnecessary.'},
+    {q:'You ___ be more careful with your word choice in formal writing.',opts:['ought to','must','will','should'],ans:0,exp:'"Ought to" = moral/professional obligation, slightly more formal than "should".'},
+  ],
+  v1:[
+    {q:'The findings ___ previous research on the topic.',opts:['corroborate','exacerbate','proliferate','mitigate'],ans:0,exp:'"Corroborate" = confirm or support. Subject is plural, so no -s.'},
+    {q:'The situation was further ___ by the lack of communication.',opts:['exacerbated','mitigated','substantiated','proliferated'],ans:0,exp:'"Exacerbated" = made worse. "Mitigated" = made less severe (opposite).'},
+    {q:'Technology has become ___ in every aspect of modern life.',opts:['pervasive','scarce','limited','temporary'],ans:0,exp:'"Pervasive" = spreading widely throughout; present everywhere.'},
+    {q:'She asked the committee to ___ her claims with independent data.',opts:['substantiate','proliferate','exacerbate','scrutinize'],ans:0,exp:'"Substantiate" = provide evidence to prove the truth of something.'},
+    {q:'The investigation aims to ___ every clause in the contract.',opts:['scrutinize','mitigate','culminate','juxtapose'],ans:0,exp:'"Scrutinize" = examine closely and thoroughly.'},
+    {q:'Years of effort ___ in a groundbreaking discovery.',opts:['culminated','proliferated','exacerbated','substantiated'],ans:0,exp:'"Culminate in" = reach a high point; result in.'},
+    {q:'The artist ___ images of luxury and poverty for dramatic effect.',opts:['juxtaposed','mitigated','corroborated','scrutinized'],ans:0,exp:'"Juxtapose" = place close together for contrasting effect.'},
+    {q:'Social media platforms have ___ in the last decade.',opts:['proliferated','mitigated','culminated','juxtaposed'],ans:0,exp:'"Proliferate" = increase rapidly in numbers.'},
+    {q:'The new policy will ___ the impact of the economic crisis.',opts:['mitigate','exacerbate','proliferate','culminate'],ans:0,exp:'"Mitigate" = make less severe. The opposite would be "exacerbate".'},
+    {q:'The influence of pop culture is ___ across all age groups.',opts:['pervasive','unprecedented','pragmatic','inherent'],ans:0,exp:'"Pervasive" = spreading widely throughout a group or area.'},
+  ]
+};
+
+const TODAY_PLAN = [
+  {id:'p1',ico:'⚙️',text:'Gramática: Conditionals avanzados',dur:'20 min',action:()=>openLesson('g1')},
+  {id:'p2',ico:'🃏',text:'Vocabulario: Flashcards C1',dur:'10 min',action:()=>showScreen('vocab')},
+  {id:'p3',ico:'🎧',text:'Listening: 10 ejercicios con dictado',dur:'15 min',action:()=>openListen('t1')},
+  {id:'p4',ico:'🗣️',text:'Speaking: Opinión y debate (output)',dur:'10 min',action:()=>openSpeaking(0)},
+  {id:'p5',ico:'✍️',text:'Writing: Opinion Essay',dur:'10 min',action:()=>openWriting('w1')},
+  {id:'p6',ico:'🤖',text:'Tutor IA: Conversación libre',dur:'5 min',action:()=>showScreen('ai')},
+];
+
+const LESSON_CONTENT = {
+  g1:`<div class="lesson-body">
+<h2>🎯 Conditionals — De B1 a C1</h2>
+<p>Los condicionales son estructuras fundamentales del inglés avanzado. Dominarlos es clave para el nivel C1.</p>
+<h2>Type 2 — Hypothetical Present/Future</h2>
+<p>Estructura: <span class="hl">If + Past Simple, would + base verb</span></p>
+<div class="ex-box">"If I <strong>had</strong> more time, I <strong>would study</strong> Italian."<br>"She <strong>would travel</strong> more if she <strong>earned</strong> a higher salary."</div>
+<h2>Type 3 — Hypothetical Past</h2>
+<p>Estructura: <span class="hl">If + Past Perfect, would have + past participle</span></p>
+<div class="ex-box">"If I <strong>had studied</strong> harder, I <strong>would have passed</strong>."</div>
+<h2>Mixed Conditionals — C1</h2>
+<p>Conectan pasado con presente:</p>
+<div class="ex-box">"If I <strong>had taken</strong> that job (past), I <strong>would be living</strong> in London now."</div>
+<h2>⚡ Inversion — Registro Formal C1</h2>
+<ul>
+<li><span class="hl">Had I known</span> → "If I had known"</li>
+<li><span class="hl">Were I to leave</span> → "If I were to leave"</li>
+<li><span class="hl">Should you need</span> help → "If you need help"</li>
+</ul>
+<div class="ex-box">"<strong>Had the company invested</strong> wisely, it would not have faced bankruptcy."</div>
+</div>`,
+  g2:`<div class="lesson-body">
+<h2>🔀 Modal Verbs — Avanzado</h2>
+<p>Los modales avanzados son esenciales para el C1. Cada uno tiene matices que debes dominar.</p>
+<h2>Deduction</h2>
+<ul>
+<li><span class="hl">must + base verb</span> → Certeza positiva: "She <strong>must be</strong> tired."</li>
+<li><span class="hl">can't + base verb</span> → Certeza negativa: "That <strong>can't be</strong> right."</li>
+<li><span class="hl">might/could</span> → Posibilidad: "He <strong>might be</strong> in a meeting."</li>
+</ul>
+<h2>Past Deduction</h2>
+<ul>
+<li><span class="hl">must have + past participle</span>: "She <strong>must have left</strong> early."</li>
+<li><span class="hl">can't have + past participle</span>: "He <strong>can't have seen</strong> us."</li>
+</ul>
+<h2>Criticism & Regret</h2>
+<div class="ex-box">"You <strong>should have told</strong> me earlier — I could have helped."<br>"I <strong>needn't have rushed</strong> — the meeting was cancelled."</div>
+</div>`,
+  g3:`<div class="lesson-body">
+<h2>💬 Reported Speech — Avanzado</h2>
+<p>Para transformar el discurso directo en indirecto, aplicamos "backshift" de tiempos verbales.</p>
+<h2>Backshift de tiempos</h2>
+<ul>
+<li>Present Simple → Past Simple: "I <strong>work</strong> here" → She said she <strong>worked</strong> there.</li>
+<li>Past Simple → Past Perfect: "I <strong>saw</strong> him" → She said she <strong>had seen</strong> him.</li>
+<li>Will → Would: "I <strong>will help</strong>" → She said she <strong>would help</strong>.</li>
+</ul>
+<h2>Reporting Verbs C1</h2>
+<div class="ex-box">admit, deny, insist, suggest, warn, urge, claim, argue, acknowledge</div>
+<p>Estos verbos añaden matiz: "She <strong>denied</strong> knowing about the plan." (no "said she didn't know")</p>
+</div>`
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let ST = JSON.parse(localStorage.getItem('emp_st3')||'{}');
+ST = Object.assign({streak:0,xp:0,words:0,lessons:0,scores:[],done:[],vocabIdx:0,vocabGood:0,vocabBad:0,progress:0,lastDate:'',speakIdx:0},ST);
+
+let quiz={qs:[],idx:0,score:0,id:''};
+let aiMode='conversation';
+let chatHistory=[];
+let vocabMode='flash';
+let vcFlipped=false;
+let listenAnswers={};
+let matchSelected=null;
+let matchDone=[];
+let prevScreen='home';
+let currentSpeakIdx=0;
+let speakRecognition=null;
+let isSpeakRecording=false;
+let chatRecognition=null;
+let isChatRecording=false;
+let currentTrack=null;
+let speechSynth=window.speechSynthesis;
+let utteranceSpeaking=false;
+
+function save(){localStorage.setItem('emp_st3',JSON.stringify(ST))}
+
+function checkStreak(){
+  const today=new Date().toDateString();
+  if(ST.lastDate!==today){
+    const yest=new Date(Date.now()-86400000).toDateString();
+    ST.streak=ST.lastDate===yest?ST.streak+1:1;
+    ST.lastDate=today;save();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function init(){
+  checkStreak();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  setTimeout(()=>{
+    document.getElementById('loader').style.display='none';
+    renderHome();renderModules('all');renderVocab();initChat();renderProfile();
+  },2000);
+}
+
+// ═══════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════
+function renderHome(){
+  document.getElementById('sStreak').textContent=ST.streak;
+  document.getElementById('sXP').textContent=ST.xp;
+  document.getElementById('hWords').textContent=ST.words;
+  document.getElementById('hLessons').textContent=ST.lessons;
+  document.getElementById('hStreakN').textContent=ST.streak;
+  const avg=ST.scores.length?Math.round(ST.scores.reduce((a,b)=>a+b,0)/ST.scores.length)+'%':'—';
+  document.getElementById('hAvg').textContent=avg;
+  const pct=Math.min(100,Math.round(ST.progress));
+  document.getElementById('hPct').textContent=pct+'%';
+  document.getElementById('hFill').style.width=pct+'%';
+  renderWeek();renderTasks();
+}
+
+function renderWeek(){
+  const days=['L','M','X','J','V','S','D'];
+  const tod=new Date().getDay();
+  const row=document.getElementById('weekRow');
+  row.innerHTML='';
+  days.forEach((d,i)=>{
+    const isToday=(i+1)%7===tod%7;
+    row.innerHTML+=`<div class="wday ${isToday?'today':''} ${ST.done.length>i?'done':''}">
+      <div class="wd">${d}</div><div class="wm">${ST.done.length>i?'✓':'·'}</div>
+    </div>`;
+  });
+}
+
+function renderTasks(){
+  const el=document.getElementById('todayList');
+  el.innerHTML='';
+  TODAY_PLAN.forEach(t=>{
+    const done=ST.done.includes(t.id);
+    el.innerHTML+=`<div class="task-item ${done?'done':''}" onclick="doTask('${t.id}')">
+      <div class="tico">${t.ico}</div>
+      <div class="tcheck">${done?'✓':''}</div>
+      <div class="ttext">${t.text}</div>
+      <div class="tdur">${t.dur}</div>
+    </div>`;
+  });
+}
+
+function doTask(id){
+  const t=TODAY_PLAN.find(x=>x.id===id);
+  if(t){t.action();markDone(id);}
+}
+function markDone(id){
+  if(!ST.done.includes(id)){ST.done.push(id);ST.xp+=10;save();renderTasks();}
+}
+
+// ═══════════════════════════════════════════════════════
+// MODULES
+// ═══════════════════════════════════════════════════════
+function renderModules(cat){
+  const el=document.getElementById('modGrid');
+  const list=cat==='all'?MODULES:MODULES.filter(m=>m.cat===cat);
+  el.innerHTML='';
+  list.forEach(m=>{
+    const tc=m.level==='B1'?'tag-b1':m.level==='B2'?'tag-b2':'tag-c1';
+    el.innerHTML+=`<div class="mod-card" onclick="openMod('${m.id}')">
+      <div class="mod-ico">${m.ico}</div>
+      <div class="mod-info"><h3>${m.title}</h3><p>${m.desc} · ${m.lessons} ejercicios</p></div>
+      <div class="mod-tag ${tc}">${m.level}</div>
+    </div>`;
+  });
+}
+
+function filterMods(cat,btn){
+  document.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderModules(cat);
+}
+
+function openMod(id){
+  const m=MODULES.find(x=>x.id===id);
+  if(!m) return;
+  if(m.special==='listen'){openListen('t1');return;}
+  if(m.special==='listen2'){openListen('t2');return;}
+  if(m.special==='writing'){openWriting('w1');return;}
+  if(m.special==='speaking'){openSpeaking(0);return;}
+  if(m.special==='speaking2'){openSpeaking(5);return;}
+  if(m.special==='vocab'){showScreen('vocab');return;}
+  openLesson(id);
+}
+
+// ═══════════════════════════════════════════════════════
+// LESSONS
+// ═══════════════════════════════════════════════════════
+function openLesson(id){
+  const m=MODULES.find(x=>x.id===id);
+  if(!m) return;
+  prevScreen='lessons';
+  document.getElementById('lessonTitle').textContent=m.title;
+  const content=LESSON_CONTENT[id]||`<div class="lesson-body"><h2>📚 ${m.title}</h2><p>Este módulo está en preparación. Practica con el Tutor IA.</p></div>`;
+  const hasQuiz=!!QUIZ_BANKS[id];
+  document.getElementById('lessonContent').innerHTML=content+`
+    ${hasQuiz?`<button class="btn btn-primary" onclick="startQuiz('${id}')">📝 Evaluación (${QUIZ_BANKS[id].length} preguntas)</button>`:''}
+    <button class="btn btn-secondary" onclick="showScreen('ai');setTimeout(()=>{document.getElementById('chatIn').value='Explícame ${m.title} con ejemplos y ejercicios';sendMsg()},300)">🤖 Practicar con IA</button>
+    <button class="btn btn-secondary" onclick="goBack()">← Volver a módulos</button>`;
+  showScreen('lesson');
+  ST.lessons++;ST.xp+=5;ST.progress=Math.min(100,ST.progress+0.6);save();
+}
+
+// ═══════════════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════════════
+function startQuiz(id){
+  const bank=QUIZ_BANKS[id];
+  if(!bank){alert('Evaluación no disponible.');return;}
+  quiz={qs:bank,idx:0,score:0,id};
+  prevScreen='lesson';
+  document.getElementById('quizLabel').textContent=MODULES.find(m=>m.id===id)?.title||'Evaluación';
+  renderQ();showScreen('quiz');
+}
+
+function renderQ(){
+  const q=quiz.qs[quiz.idx],tot=quiz.qs.length;
+  let dots='';
+  for(let i=0;i<tot;i++) dots+=`<div class="qp ${i<quiz.idx?'done':i===quiz.idx?'cur':''}"></div>`;
+  document.getElementById('quizProg').innerHTML=dots;
+  document.getElementById('quizContent').innerHTML=`
+    <div class="q-card">
+      <div class="q-num">Pregunta ${quiz.idx+1} de ${tot}</div>
+      <div class="q-text">${q.q}</div>
+    </div>
+    <div class="opts">${q.opts.map((o,i)=>`<button class="opt" id="opt${i}" onclick="pickAns(${i})">
+      <div class="opt-l">${['A','B','C','D'][i]}</div>${o}
+    </button>`).join('')}</div>`;
+}
+
+function pickAns(idx){
+  const q=quiz.qs[quiz.idx];
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=null);
+  const ok=idx===q.ans;
+  document.getElementById('opt'+idx).classList.add(ok?'correct':'wrong');
+  if(!ok) document.getElementById('opt'+q.ans).classList.add('correct');
+  if(ok){quiz.score++;ST.xp+=15;}
+  const fb=document.createElement('div');fb.className='feedback';
+  fb.innerHTML=`${ok?'✅ <strong>Correcto!</strong>':'❌ <strong>Incorrecto.</strong>'}<br/>${q.exp}`;
+  document.querySelector('.opts').after(fb);
+  const nb=document.createElement('button');nb.className='btn btn-primary';
+  const last=quiz.idx===quiz.qs.length-1;
+  nb.textContent=last?'Ver resultados →':'Siguiente →';
+  nb.onclick=last?finishQuiz:nextQ;
+  nb.style.marginTop='8px';
+  fb.after(nb);save();
+}
+
+function nextQ(){quiz.idx++;renderQ();}
+
+function finishQuiz(){
+  const tot=quiz.qs.length,pct=Math.round((quiz.score/tot)*100);
+  ST.scores.push(pct);ST.xp+=30;ST.progress=Math.min(100,ST.progress+1.5);save();
+  document.getElementById('quizProg').innerHTML='';
+  document.getElementById('quizContent').innerHTML=`
+    <div class="result-card">
+      <div class="r-emoji">${pct>=80?'🎉':pct>=60?'👍':'📚'}</div>
+      <div class="r-score">${pct}%</div>
+      <div class="r-msg">${quiz.score} de ${tot} correctas · ${pct>=80?'¡Excelente!':pct>=60?'Buen progreso.':'Sigue practicando.'}</div>
+      <div class="tip-box">${pct>=80?'Has dominado este módulo.':'Revisa la lección y usa el Tutor IA para aclarar dudas.'}</div>
+      <button class="btn btn-primary" onclick="goBack()">Continuar</button>
+      <button class="btn btn-secondary" onclick="startQuiz('${quiz.id}')">Repetir evaluación</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// VOCAB
+// ═══════════════════════════════════════════════════════
+function setVocabMode(mode,btn){
+  vocabMode=mode;
+  document.querySelectorAll('#sc-vocab .itab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderVocab();
+}
+
+function renderVocab(){
+  const el=document.getElementById('vocabContent');
+  if(vocabMode==='flash') renderFlash(el);
+  else if(vocabMode==='fill') renderFill(el);
+  else renderMatch(el);
+}
+
+function renderFlash(el){
+  const card=VOCAB_DECK[ST.vocabIdx%VOCAB_DECK.length];
+  vcFlipped=false;
+  el.innerHTML=`
+    <div class="vc-counter">Tarjeta ${(ST.vocabIdx%VOCAB_DECK.length)+1} de ${VOCAB_DECK.length} · Aprendidas: ${ST.vocabGood}</div>
+    <div class="vc-wrap" onclick="flipVC()">
+      <div class="vc" id="vcCard">
+        <div class="vc-front">
+          <div class="vc-type">${card.type}</div>
+          <div class="vc-word">${card.word}</div>
+          <div class="vc-phon">${card.phon}</div>
+          <button class="tts-btn" onclick="event.stopPropagation();speakText('${card.word}')">🔊 Escuchar</button>
+          <div class="vc-hint" style="margin-top:8px">Toca para ver definición</div>
+        </div>
+        <div class="vc-back">
+          <div class="vc-def">${card.def}</div>
+          <div class="vc-ex">"${card.ex}"</div>
+          <div class="vc-syn">${card.syn}</div>
+        </div>
+      </div>
+    </div>
+    <div class="vc-nav">
+      <button class="vc-btn hard" onclick="rateVC('hard')">😕 Difícil</button>
+      <button class="vc-btn" onclick="rateVC('ok')">😐 Ok</button>
+      <button class="vc-btn easy" onclick="rateVC('easy')">✅ La sé</button>
+    </div>`;
+}
+
+function flipVC(){
+  const c=document.getElementById('vcCard');
+  if(c){vcFlipped=!vcFlipped;c.classList.toggle('flipped',vcFlipped);}
+}
+
+function rateVC(r){
+  if(r==='easy'){ST.vocabGood++;ST.words++;ST.xp+=8;}
+  else if(r==='hard'){ST.vocabBad++;}
+  ST.vocabIdx++;
+  ST.progress=Math.min(100,ST.progress+0.2);
+  save();renderVocab();
+}
+
+function renderFill(el){
+  el.innerHTML=`
+    <div class="tip-box"><strong>💡</strong> Completa las 10 frases con la palabra correcta. Usa las pistas si necesitas ayuda.</div>
+    ${FIB_EXERCISES.map((e,i)=>`
+      <div class="card" style="margin-bottom:10px;padding:16px">
+        <div class="fib-sentence">${i+1}. ${e.before}<input class="fib-input" id="fib${i}" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false"/>${e.after} <span class="hint-tag">💡 ${e.hint}</span></div>
+      </div>`).join('')}
+    <div id="fibResult"></div>
+    <button class="btn btn-primary" onclick="checkFib()">✓ Comprobar respuestas</button>`;
+}
+
+function checkFib(){
+  let correct=0;
+  FIB_EXERCISES.forEach((e,i)=>{
+    const inp=document.getElementById('fib'+i);
+    if(!inp) return;
+    const ok=inp.value.trim().toLowerCase()===e.blank.toLowerCase();
+    inp.classList.remove('correct','wrong');
+    inp.classList.add(ok?'correct':'wrong');
+    inp.disabled=true;
+    if(ok) correct++;
+  });
+  const pct=Math.round((correct/FIB_EXERCISES.length)*100);
+  document.getElementById('fibResult').innerHTML=`
+    <div class="feedback">
+      ${correct===FIB_EXERCISES.length?'🎉':'📚'} <strong>${correct} de ${FIB_EXERCISES.length} correctas (${pct}%)</strong><br>
+      ${FIB_EXERCISES.map((e,i)=>{
+        const inp=document.getElementById('fib'+i);
+        return inp&&inp.classList.contains('wrong')?`<div style="margin-top:5px">• Respuesta correcta: <span style="color:var(--a3)">${e.blank}</span></div>`:'';
+      }).join('')}
+    </div>
+    <button class="btn btn-secondary" onclick="setVocabMode('fill',document.querySelector('#sc-vocab .itab:nth-child(2)'))">Reintentar</button>`;
+  ST.xp+=correct*10;ST.progress=Math.min(100,ST.progress+0.5);save();
+}
+
+function renderMatch(el){
+  if(matchDone.length>=MATCH_PAIRS.length){
+    el.innerHTML=`<div class="result-card"><div class="r-emoji">🎉</div><div class="r-score">100%</div><div class="r-msg">¡Completaste el ejercicio!</div>
+    <button class="btn btn-primary" onclick="resetMatch()">Repetir</button></div>`;return;
+  }
+  const remaining=MATCH_PAIRS.filter((_,i)=>!matchDone.includes(i));
+  const shuffledDefs=[...remaining].sort(()=>Math.random()-.5);
+  let html=`<div class="tip-box"><strong>💡</strong> Selecciona una palabra y luego su significado.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">
+  <div style="display:flex;flex-direction:column;gap:7px">
+  <div style="font-size:.65rem;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Palabras</div>`;
+  remaining.forEach(p=>{
+    const origIdx=MATCH_PAIRS.indexOf(p);
+    html+=`<button class="btn-outline" id="mw${origIdx}" onclick="selectMatch('word',${origIdx})">${p.word}</button>`;
+  });
+  html+=`</div><div style="display:flex;flex-direction:column;gap:7px">
+  <div style="font-size:.65rem;color:var(--t2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Significados</div>`;
+  shuffledDefs.forEach(p=>{
+    const origIdx=MATCH_PAIRS.indexOf(p);
+    html+=`<button class="btn-outline" id="mm${origIdx}" onclick="selectMatch('match',${origIdx})" style="font-size:.72rem;text-align:left">${p.match}</button>`;
+  });
+  html+=`</div></div><div id="matchMsg"></div>`;
+  el.innerHTML=html;
+}
+
+let matchWordSel=null;
+function selectMatch(type,idx){
+  if(type==='word'){
+    if(matchWordSel!==null){const prev=document.getElementById('mw'+matchWordSel);if(prev){prev.style.borderColor='';prev.style.color='';}}
+    matchWordSel=idx;
+    const btn=document.getElementById('mw'+idx);
+    if(btn){btn.style.borderColor='var(--accent)';btn.style.color='var(--accent)';}
+  } else {
+    if(matchWordSel===null) return;
+    if(matchWordSel===idx){
+      matchDone.push(idx);ST.xp+=8;save();
+      const msg=document.getElementById('matchMsg');
+      if(msg) msg.innerHTML=`<div class="feedback" style="border-color:var(--a3)">✅ <strong>Correcto!</strong> ${MATCH_PAIRS[idx].word} = ${MATCH_PAIRS[idx].match}</div>`;
+      setTimeout(()=>renderMatch(document.getElementById('vocabContent')),1200);
+    } else {
+      const msg=document.getElementById('matchMsg');
+      if(msg) msg.innerHTML=`<div class="feedback" style="border-color:var(--a2)">❌ Intenta de nuevo.</div>`;
+      const prev=document.getElementById('mw'+matchWordSel);
+      if(prev){prev.style.borderColor='';prev.style.color='';}
+      matchWordSel=null;
+    }
+  }
+}
+function resetMatch(){matchDone=[];renderVocab();}
+
+// ═══════════════════════════════════════════════════════
+// LISTENING — 10 EXERCISES (5 questions + 5 fill-in-blank)
+// ═══════════════════════════════════════════════════════
+function openListen(id){
+  prevScreen='lessons';
+  showScreen('listen');
+  renderListenTrack(id);
+  markDone('p3');
+}
+
+function renderListenTrack(id){
+  const track=LISTEN_TRACKS.find(t=>t.id===id)||LISTEN_TRACKS[0];
+  currentTrack=track;
+  listenAnswers={};
+  const el=document.getElementById('listenContent');
+
+  const tabs=LISTEN_TRACKS.map(t=>`<button class="itab ${t.id===id?'active':''}" onclick="renderListenTrack('${t.id}')">${t.title.substring(0,18)}...</button>`).join('');
+
+  const questionsHTML=track.questions.map((q,qi)=>`
+    <div style="margin-bottom:12px">
+      <div class="listen-q">${qi+1}. ${q.q}</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${q.opts.map((o,oi)=>`<button class="opt" id="lq${qi}_${oi}" onclick="answerListen(${qi},${oi},${q.ans},'${id}')">
+          <div class="opt-l">${['A','B','C','D'][oi]}</div>${o}
+        </button>`).join('')}
+      </div>
+    </div>`).join('<div style="height:6px"></div>');
+
+  const fillHTML=track.fillBlanks.map((f,fi)=>`
+    <div class="lf-item">${fi+1}. ${f.before}<input class="lf-input" id="lf${fi}" placeholder="..." autocomplete="off" autocorrect="off" spellcheck="false"/>  ${f.after} <span class="hint-tag">💡 ${f.hint}</span></div>
+  `).join('');
+
+  el.innerHTML=`
+    <div class="itabs">${tabs}</div>
+    <div class="listen-card">
+      <h3>🎧 ${track.title}</h3>
+      <div style="display:flex;gap:7px;margin-bottom:12px">
+        <span class="badge badge-accent">${track.level}</span>
+        <span class="badge badge-gold">⏱ ${track.duration}</span>
+        <span class="badge badge-green">10 ejercicios</span>
+      </div>
+      <div class="tip-box"><strong>📋 Instrucciones:</strong> 1) Escucha el audio. 2) Responde las 5 preguntas de comprensión. 3) Completa las 5 frases con lo que escuchaste.</div>
+      <div class="audio-player">
+        <div class="audio-title">🎵 Audio — presiona play para escuchar</div>
+        <div class="audio-controls">
+          <button class="play-btn" id="playBtn" onclick="toggleAudio('${id}')">▶</button>
+          <div class="audio-pw">
+            <input type="range" class="audio-prog" id="audioProg" value="0" min="0" max="100" oninput="seekAudio(this.value)"/>
+            <div style="display:flex;justify-content:space-between;margin-top:2px">
+              <span id="curTime" class="audio-time">0:00</span>
+              <span class="audio-time">${track.duration}</span>
+            </div>
+          </div>
+          <select class="audio-speed" id="audioSpeed" onchange="changeSpeed(this.value)">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+          </select>
+        </div>
+        <div style="font-size:.73rem;color:var(--t2);margin-top:9px;margin-bottom:5px">📄 Transcript (muéstralo después de escuchar)</div>
+        <details>
+          <summary style="font-size:.75rem;color:var(--accent);cursor:pointer;padding:4px 0">Ver transcript</summary>
+          <div class="transcript-box">${track.text.replace(/\[pause\]/g,'').split(' ').map((w,i)=>`<span class="w" onclick="speakText('${w.replace(/[^a-zA-Z]/g,'')}')">${w} </span>`).join('')}</div>
+        </details>
+      </div>
+    </div>
+
+    <div class="listen-card">
+      <h3>❓ Parte 1: Comprensión (5 preguntas)</h3>
+      <div class="listen-qs">${questionsHTML}</div>
+      <div id="listenResult1" style="margin-top:12px"></div>
+    </div>
+
+    <div class="listen-card">
+      <h3>✏️ Parte 2: Dictado — completa lo que escuchaste (5 frases)</h3>
+      <div class="tip-box"><strong>💡</strong> Escucha el audio de nuevo y completa las palabras que faltan.</div>
+      <div class="listen-fill">
+        <h4>Completa las frases del audio:</h4>
+        ${fillHTML}
+      </div>
+      <div id="listenFillResult" style="margin-top:12px"></div>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="checkListenFill('${id}')">✓ Verificar dictado</button>
+    </div>`;
+}
+
+let listenAnswersData={};
+function answerListen(qi,oi,ans,trackId){
+  if(!listenAnswersData[trackId]) listenAnswersData[trackId]={};
+  if(listenAnswersData[trackId][qi]!==undefined) return;
+  listenAnswersData[trackId][qi]=oi;
+  const ok=oi===ans;
+  document.getElementById(`lq${qi}_${oi}`).classList.add(ok?'correct':'wrong');
+  if(!ok) document.getElementById(`lq${qi}_${ans}`).classList.add('correct');
+  for(let i=0;i<4;i++){const b=document.getElementById(`lq${qi}_${i}`);if(b)b.onclick=null;}
+  if(ok){ST.xp+=10;save();}
+  const track=LISTEN_TRACKS.find(t=>t.id===trackId);
+  if(Object.keys(listenAnswersData[trackId]).length>=track.questions.length){
+    const correct=track.questions.filter((q,i)=>listenAnswersData[trackId][i]===q.ans).length;
+    document.getElementById('listenResult1').innerHTML=`
+      <div class="feedback">🎯 <strong>${correct} de ${track.questions.length} correctas</strong> · ${correct===track.questions.length?'¡Perfecto!':'Escucha de nuevo las partes que fallaste.'}</div>`;
+    ST.progress=Math.min(100,ST.progress+0.8);save();
+  }
+}
+
+function checkListenFill(trackId){
+  const track=LISTEN_TRACKS.find(t=>t.id===trackId);
+  if(!track) return;
+  let correct=0;
+  track.fillBlanks.forEach((f,i)=>{
+    const inp=document.getElementById('lf'+i);
+    if(!inp) return;
+    const ok=inp.value.trim().toLowerCase()===f.blank.toLowerCase();
+    inp.classList.remove('correct','wrong');
+    inp.classList.add(ok?'correct':'wrong');
+    inp.disabled=true;
+    if(ok) correct++;
+  });
+  const pct=Math.round((correct/track.fillBlanks.length)*100);
+  document.getElementById('listenFillResult').innerHTML=`
+    <div class="feedback">
+      ✏️ <strong>${correct} de ${track.fillBlanks.length} correctas en dictado (${pct}%)</strong><br>
+      ${track.fillBlanks.map((f,i)=>{
+        const inp=document.getElementById('lf'+i);
+        return inp&&inp.classList.contains('wrong')?`<div style="margin-top:4px">• Respuesta: <span style="color:var(--a3)">${f.blank}</span></div>`:'';
+      }).join('')}
+    </div>`;
+  ST.xp+=correct*12;ST.progress=Math.min(100,ST.progress+0.8);save();
+}
+
+// Audio via Speech Synthesis
+let speaking=false;let audioInterval=null;let totalDur=0;let elapsed=0;let speedMult=1;
+function toggleAudio(id){
+  const track=LISTEN_TRACKS.find(t=>t.id===id)||LISTEN_TRACKS[0];
+  if(speaking){
+    speechSynth.cancel();speaking=false;clearInterval(audioInterval);
+    const pb=document.getElementById('playBtn');if(pb){pb.textContent='▶';pb.classList.remove('speaking');}
+    return;
+  }
+  speaking=true;
+  const pb=document.getElementById('playBtn');if(pb){pb.textContent='⏸';pb.classList.add('speaking');}
+  const sentences=track.text.split('[pause]').map(s=>s.trim()).filter(Boolean);
+  totalDur=sentences.reduce((a,s)=>a+s.split(' ').length*0.55,0)*1000;
+  elapsed=0;
+  let idx=0;
+  function speakNext(){
+    if(idx>=sentences.length){
+      speaking=false;clearInterval(audioInterval);
+      const pb2=document.getElementById('playBtn');if(pb2){pb2.textContent='▶';pb2.classList.remove('speaking');}
+      const ap=document.getElementById('audioProg');if(ap) ap.value=100;
+      return;
+    }
+    const u=new SpeechSynthesisUtterance(sentences[idx]);
+    u.rate=speedMult*0.85;u.pitch=1;u.lang='en-US';
+    const voices=speechSynth.getVoices();
+    const en=voices.find(v=>v.lang.startsWith('en-')&&!v.name.includes('Google'))||voices.find(v=>v.lang.startsWith('en-'));
+    if(en) u.voice=en;
+    u.onend=()=>{idx++;setTimeout(speakNext,400/speedMult);};
+    speechSynth.speak(u);
+  }
+  speakNext();
+  audioInterval=setInterval(()=>{
+    elapsed+=250;
+    const pct=Math.min(100,(elapsed/totalDur)*100);
+    const ap=document.getElementById('audioProg');if(ap) ap.value=pct;
+    const sec=Math.floor(elapsed/1000),m=Math.floor(sec/60),s=(sec%60).toString().padStart(2,'0');
+    const ct=document.getElementById('curTime');if(ct) ct.textContent=`${m}:${s}`;
+  },250);
+}
+
+function seekAudio(val){/* visual only for synth */}
+function changeSpeed(v){speedMult=parseFloat(v);}
+function speakText(txt){
+  if(!txt||txt.length<2) return;
+  speechSynth.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.rate=0.85;u.lang='en-US';
+  const voices=speechSynth.getVoices();
+  const en=voices.find(v=>v.lang.startsWith('en-'));if(en) u.voice=en;
+  speechSynth.speak(u);
+}
+
+// ═══════════════════════════════════════════════════════
+// WRITING — 10 EXERCISES
+// ═══════════════════════════════════════════════════════
+function openWriting(id){
+  prevScreen='lessons';
+  showScreen('writing');
+  renderWritingExercise(id);
+}
+
+function renderWritingExercise(id){
+  const pr=WRITING_PROMPTS.find(p=>p.id===id)||WRITING_PROMPTS[0];
+  document.getElementById('writingTitle').textContent=`Writing · ${pr.title}`;
+  const navBtns=WRITING_PROMPTS.map((p,i)=>`<button class="itab ${p.id===id?'active':''}" onclick="renderWritingExercise('${p.id}')">${i+1}. ${p.title.substring(0,12)}</button>`).join('');
+  document.getElementById('writingContent').innerHTML=`
+    <div class="itabs" style="flex-wrap:wrap">${navBtns}</div>
+    <div class="writing-prompt">
+      <h3>${pr.title} <span class="badge badge-${pr.level==='C1'?'accent':pr.level==='B2'?'gold':'green'}">${pr.level}</span></h3>
+      <p>${pr.prompt}</p>
+    </div>
+    <div class="tip-box">
+      <strong>✅ Tips:</strong><br>
+      ${pr.tips.map(t=>`• ${t}`).join('<br>')}
+    </div>
+    <div style="font-size:.75rem;color:var(--t2);margin-bottom:7px">💡 Key phrases (click to insert):</div>
+    <div class="key-phrases" id="kpContainer">
+      ${pr.keyPhrases.map(kp=>`<span class="kp" onclick="insertPhrase('${kp.replace(/'/g,"\\'")}','warea')">${kp}</span>`).join('')}
+    </div>
+    <br>
+    <textarea class="writing-area" id="warea" placeholder="Escribe aquí tu respuesta en inglés..." oninput="countWords(this,'wcount')"></textarea>
+    <div class="wcount" id="wcount">0 palabras</div>
+    <button class="btn btn-primary" id="wSubmitBtn" onclick="submitWriting('${id}')">📤 Enviar para corrección con IA</button>
+    <div id="writingFeedback"></div>`;
+}
+
+function insertPhrase(phrase,areaId){
+  const ta=document.getElementById(areaId);
+  if(!ta) return;
+  const pos=ta.selectionStart;
+  ta.value=ta.value.slice(0,pos)+phrase+ta.value.slice(pos);
+  ta.focus();countWords(ta,'wcount');
+}
+
+function countWords(ta,countId){
+  const words=ta.value.trim().split(/\s+/).filter(w=>w.length>0).length;
+  const el=document.getElementById(countId);
+  if(el) el.textContent=`${words} palabras`;
+}
+
+async function submitWriting(id){
+  const ta=document.getElementById('warea');
+  const text=ta?.value.trim();
+  if(!text||text.split(/\s+/).length<20){alert('Por favor escribe al menos 20 palabras antes de enviar.');return;}
+  const pr=WRITING_PROMPTS.find(p=>p.id===id);
+  const btn=document.getElementById('wSubmitBtn');
+  btn.disabled=true;btn.textContent='⏳ Analizando...';
+  document.getElementById('writingFeedback').innerHTML=`<div class="feedback"><div class="dots"><span></span><span></span><span></span></div></div>`;
+
+  const prompt=`You are an expert English writing coach for B1-C1 learners. The student submitted this writing task:
+
+TASK: ${pr.prompt}
+
+STUDENT'S TEXT:
+"${text}"
+
+Provide detailed feedback in Spanish covering:
+1. **Gramática** (Grammar mistakes with corrections)
+2. **Vocabulario** (Vocabulary improvements — suggest more advanced words)
+3. **Coherencia** (Structure and flow)
+4. **Logro de la tarea** (Did they answer the prompt fully?)
+5. **Puntuación global** (Score out of 100 and CEFR level of the writing)
+
+Use markdown-style formatting. Be encouraging but honest. Give a corrected version of 1-2 sentences as an example improvement.`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await resp.json();
+    const reply=data.content?.[0]?.text||'Error obteniendo respuesta.';
+    document.getElementById('writingFeedback').innerHTML=`
+      <div class="writing-fb">${reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>')}</div>
+      <button class="btn btn-secondary" onclick="renderWritingExercise('${id}')">Nueva versión</button>`;
+    ST.xp+=25;ST.progress=Math.min(100,ST.progress+1.2);save();
+    markDone('p5');
+  }catch(e){
+    document.getElementById('writingFeedback').innerHTML=`<div class="feedback">⚠️ Error: ${e.message}. Verifica tu conexión.</div>`;
+  }
+  btn.disabled=false;btn.textContent='📤 Enviar para corrección con IA';
+}
+
+// ═══════════════════════════════════════════════════════
+// SPEAKING — 10 OUTPUT-FIRST EXERCISES
+// ═══════════════════════════════════════════════════════
+function openSpeaking(startIdx){
+  prevScreen='lessons';
+  currentSpeakIdx=startIdx||0;
+  showScreen('speaking');
+  renderSpeakExercise(currentSpeakIdx);
+  markDone('p4');
+}
+
+function renderSpeakExercise(idx){
+  const ex=SPEAKING_EXERCISES[idx%SPEAKING_EXERCISES.length];
+  const total=SPEAKING_EXERCISES.length;
+  const el=document.getElementById('speakingContent');
+  
+  const dots=SPEAKING_EXERCISES.map((_,i)=>`<div class="ec-dot ${i<idx?'done':i===idx?'cur':''}"></div>`).join('');
+  
+  el.innerHTML=`
+    <div class="ex-counter">
+      <span class="ec-label">Ejercicio ${idx+1} de ${total}</span>
+      <div class="ec-dots">${dots}</div>
+    </div>
+    <div class="output-badge">🗣️ OUTPUT · Hablar es la clave del éxito</div>
+    <div class="speak-card">
+      <h3>${ex.title} <span class="badge badge-${ex.level==='C1'?'accent':'gold'}">${ex.level}</span></h3>
+      <div class="speak-prompt">
+        <p>${ex.prompt}</p>
+      </div>
+      ${ex.prepTime?`<div class="tip-box"><strong>⏱️ Tienes ${ex.prepTime}s para preparar</strong> · Luego habla durante ${ex.duration}s</div>`:''}
+      <div class="tip-box">
+        <strong>📌 Vocabulary clave:</strong><br>
+        ${ex.vocab.map(v=>`<span class="kp" style="display:inline-block;margin:2px 3px;cursor:default">${v}</span>`).join('')}
+      </div>
+      <div class="speak-tips">
+        <strong style="font-size:.75rem;color:var(--t2)">TIPS:</strong>
+        <ul>${ex.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+      </div>
+      
+      <div class="rec-area">
+        <button class="rec-btn idle" id="recBtn" onclick="toggleSpeak()">🎤</button>
+        <div class="rec-status" id="recStatus">Presiona para hablar</div>
+        <div style="font-size:.72rem;color:var(--t2)">Objetivo: ${ex.duration}s · Usa las frases clave</div>
+      </div>
+      
+      <div id="speakTranscript" class="speak-transcript" style="display:none"></div>
+      <div id="speakScores" style="display:none"></div>
+      <div id="speakFeedback" style="display:none"></div>
+      
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-secondary" style="flex:1" onclick="speakText('${ex.title}')" title="Escuchar el título pronunciado">🔊 Pronunciación</button>
+        <button class="btn btn-primary" style="flex:2" id="analyzeBtn" onclick="analyzeSpeak(${idx})" style="display:none">🤖 Analizar con IA</button>
+      </div>
+    </div>
+    
+    <div style="display:flex;gap:8px;margin-top:12px">
+      ${idx>0?`<button class="btn btn-secondary" style="flex:1" onclick="renderSpeakExercise(${idx-1})">← Anterior</button>`:'<div style="flex:1"></div>'}
+      ${idx<total-1?`<button class="btn btn-primary" style="flex:1" onclick="renderSpeakExercise(${idx+1})">Siguiente →</button>`:`<button class="btn btn-primary" style="flex:1;background:var(--a3);color:#000" onclick="finishSpeaking()">🎉 Completar</button>`}
+    </div>`;
+}
+
+let speakText_captured='';
+function toggleSpeak(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    // Fallback: manual text entry
+    const t=document.getElementById('speakTranscript');
+    t.style.display='block';
+    t.contentEditable='true';
+    t.innerHTML='<em style="color:var(--t2)">Tu navegador no soporta reconocimiento de voz. Escribe tu respuesta aquí para análisis de IA:</em><br>';
+    document.getElementById('recStatus').textContent='Escribe tu respuesta abajo';
+    document.getElementById('analyzeBtn')?.style?.setProperty('display','flex');
+    return;
+  }
+  if(isSpeakRecording){
+    if(speakRecognition) speakRecognition.stop();
+    return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  speakRecognition=new SR();
+  speakRecognition.lang='en-US';
+  speakRecognition.continuous=true;
+  speakRecognition.interimResults=true;
+  speakText_captured='';
+  
+  const btn=document.getElementById('recBtn');
+  const status=document.getElementById('recStatus');
+  const transcript=document.getElementById('speakTranscript');
+  
+  speakRecognition.onstart=()=>{
+    isSpeakRecording=true;
+    btn.className='rec-btn recording';btn.textContent='⏹';
+    status.textContent='🔴 Grabando... habla en inglés';
+    transcript.style.display='block';
+  };
+  speakRecognition.onresult=e=>{
+    let interim='',final='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    speakText_captured+=final;
+    transcript.innerHTML=`<span style="color:var(--text)">${speakText_captured}</span><span style="color:var(--t2)">${interim}</span>`;
+  };
+  speakRecognition.onerror=e=>{
+    isSpeakRecording=false;btn.className='rec-btn idle';btn.textContent='🎤';
+    status.textContent=`Error: ${e.error}. Intenta de nuevo.`;
+  };
+  speakRecognition.onend=()=>{
+    isSpeakRecording=false;
+    btn.className='rec-btn done';btn.textContent='✓';
+    status.textContent='✅ Grabación completa — analiza con IA';
+    const ab=document.getElementById('analyzeBtn');
+    if(ab){ab.style.display='flex';}
+    ST.xp+=10;save();
+  };
+  speakRecognition.start();
+}
+
+async function analyzeSpeak(idx){
+  const ex=SPEAKING_EXERCISES[idx];
+  const text=speakText_captured||document.getElementById('speakTranscript')?.innerText||'';
+  if(!text||text.length<20){
+    alert('Necesitas grabar al menos 10 palabras para el análisis.');return;
+  }
+  const btn=document.getElementById('analyzeBtn');
+  btn.disabled=true;btn.textContent='⏳ Analizando...';
+  
+  const prompt=`You are an expert English speaking coach for CEFR B1-C1 learners. Analyze this speaking response:
+
+TASK: "${ex.prompt}"
+STUDENT SAID: "${text}"
+
+Score these 4 dimensions (0-25 each, total /100):
+1. **Fluency & Coherence** — flow, hesitations, logical structure
+2. **Vocabulary Range** — variety, appropriacy, C1 words
+3. **Grammar Accuracy** — errors, complex structures used
+4. **Task Achievement** — did they answer the prompt?
+
+Respond in Spanish. Format:
+- Give each score with brief explanation
+- 2-3 specific grammar/vocabulary corrections
+- 1 excellent phrase they used
+- 1 tip for improvement
+- Overall IELTS-style band estimate (B1/B2/C1)`;
+
+  const scoreEl=document.getElementById('speakScores');
+  const fbEl=document.getElementById('speakFeedback');
+  scoreEl.style.display='block';
+  scoreEl.innerHTML=`<div class="feedback"><div class="dots"><span></span><span></span><span></span></div></div>`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await resp.json();
+    const reply=data.content?.[0]?.text||'Error.';
+    scoreEl.innerHTML=`<div class="writing-fb">${reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>')}</div>`;
+    fbEl.style.display='block';
+    ST.xp+=20;ST.progress=Math.min(100,ST.progress+1.5);save();
+  }catch(e){
+    scoreEl.innerHTML=`<div class="feedback">⚠️ ${e.message}</div>`;
+  }
+  btn.disabled=false;btn.textContent='🤖 Analizar con IA';
+}
+
+function finishSpeaking(){
+  ST.xp+=50;ST.progress=Math.min(100,ST.progress+3);save();
+  document.getElementById('speakingContent').innerHTML=`
+    <div class="result-card">
+      <div class="r-emoji">🎉</div>
+      <div class="r-score">100%</div>
+      <div class="r-msg">¡Completaste los 10 ejercicios de speaking!</div>
+      <div class="tip-box"><strong>🗣️ Output-First:</strong> Hablar regularmente es la forma más rápida de alcanzar el C1. ¡Practica con el Tutor IA cada día!</div>
+      <button class="btn btn-primary" onclick="openSpeaking(0)">Repetir ejercicios</button>
+      <button class="btn btn-secondary" onclick="showScreen('ai')">💬 Practicar con Tutor IA</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// AI CHAT + VOICE INPUT
+// ═══════════════════════════════════════════════════════
+const AI_PROMPTS={
+  conversation:`You are an enthusiastic English conversation tutor helping a Spanish speaker go from B1 to C1. 
+- Converse naturally in English, gently correcting mistakes inline (e.g., "Great idea! Just note: we say '...' not '...'")
+- Encourage more complex vocabulary and structures
+- Ask follow-up questions to keep the conversation flowing
+- Respond in English but explain corrections briefly in Spanish
+- Keep responses concise (3-5 sentences) for natural conversation flow`,
+  grammar:`You are a grammar coach for B1→C1 English learners (native language: Spanish).
+- When given text, correct grammar, vocabulary, and style errors
+- Explain each correction with the grammar rule in Spanish
+- Provide a corrected version at the end
+- Focus on C1-level structures: inversion, passive voice, conditionals, modal verbs
+- Use markdown bold for corrections`,
+  writing:`You are a writing coach for Cambridge CAE/C1 Advanced exam preparation.
+- Evaluate writing for: Grammar, Vocabulary, Coherence, Task Achievement, Register (each /20)
+- Give specific, actionable feedback
+- Provide example improved sentences
+- Respond primarily in Spanish for clarity`,
+  exam:`You are a Cambridge CAE C1 Advanced exam simulator.
+- Give authentic CAE-style exercises: Use of English, Reading, Writing tasks
+- Assess answers against official CAE marking criteria
+- Explain answers thoroughly
+- Start with a Use of English Part 4 (key word transformations) exercise`,
+  pronunciation:`You are a pronunciation coach for English learners (B1-C1).
+- Give phonetic transcriptions (IPA) for words
+- Explain word stress, sentence rhythm, and intonation
+- Focus on common Spanish-speaker difficulties: /θ/, /ð/, /æ/, /ɪ/, /ʊ/
+- Give minimal pairs practice
+- Describe mouth position for difficult sounds`
+};
+
+function initChat(){
+  const welcome={
+    conversation:"Hello! 😊 I'm your AI English tutor. Ready to take you from B1 to C1! What shall we talk about today? You can also use the microphone button to practice speaking directly with me.",
+    grammar:"¡Hola! ✏️ Pega cualquier texto en inglés y corregiré gramática, vocabulario y estilo con explicaciones detalladas en español.",
+    writing:"Welcome to Writing Coach! 📝 Tell me what type of text you want to practice: essay, formal email, report, or letter. I'll guide you step by step.",
+    exam:"Welcome to C1 Exam Simulation! 🎓 Let's start with a **Key Word Transformation** (CAE Part 4):\n\nComplete the second sentence using the word in capitals (2-5 words):\n\n*'It wasn't necessary for him to apologize.'* — NEED\n*'He _______ apologized.'*",
+    pronunciation:"Hello! 🗣️ Type any word or sentence and I'll give you the IPA transcription, stress patterns, and tips for Spanish speakers. What would you like to practice?"
+  };
+  chatHistory=[];
+  const el=document.getElementById('chatMsgs');
+  if(el){el.innerHTML='';addAI(welcome[aiMode]);}
+}
+
+function setMode(mode,btn){
+  aiMode=mode;
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  initChat();
+}
+
+function addAI(text){
+  const el=document.getElementById('chatMsgs');
+  if(!el) return;
+  const d=document.createElement('div');d.className='msg ai';
+  const formatted=text
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/\n/g,'<br/>');
+  d.innerHTML=`<div class="msg-bubble">${formatted}</div>
+    <div class="msg-meta" style="display:flex;align-items:center;gap:7px">
+      Tutor IA
+      <button class="tts-btn" onclick="speakAIMsg(this,'${encodeURIComponent(text.replace(/['"]/g,''))}')">🔊</button>
+    </div>`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+function speakAIMsg(btn,encodedText){
+  speechSynth.cancel();
+  const text=decodeURIComponent(encodedText).replace(/<[^>]+>/g,'').replace(/[*#]/g,'');
+  btn.classList.add('speaking');btn.textContent='⏹ Parar';
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.85;u.lang='en-US';
+  const voices=speechSynth.getVoices();
+  const en=voices.find(v=>v.lang.startsWith('en-'));if(en) u.voice=en;
+  u.onend=()=>{btn.classList.remove('speaking');btn.textContent='🔊';};
+  speechSynth.speak(u);
+}
+
+function addUser(text){
+  const el=document.getElementById('chatMsgs');
+  if(!el) return;
+  const d=document.createElement('div');d.className='msg user';
+  d.innerHTML=`<div class="msg-bubble">${text}</div><div class="msg-meta">Tú</div>`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+function showDots(){
+  const el=document.getElementById('chatMsgs');
+  if(!el) return;
+  const d=document.createElement('div');d.className='msg ai';d.id='dots';
+  d.innerHTML=`<div class="msg-bubble"><div class="dots"><span></span><span></span><span></span></div></div>`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+function removeDots(){document.getElementById('dots')?.remove();}
+
+async function sendMsg(){
+  const inp=document.getElementById('chatIn');
+  const text=inp.value.trim();
+  if(!text) return;
+  inp.value='';autoResize(inp);
+  document.getElementById('chatBtn').disabled=true;
+  addUser(text);
+  chatHistory.push({role:'user',content:text});
+  showDots();markDone('p6');
+
+  try{
+    const messages=[{role:'user',content:AI_PROMPTS[aiMode]+'\n\nConversation history:\n'+chatHistory.slice(-8).map(m=>`${m.role}: ${m.content}`).join('\n')+'\\n\\nUser: '+text}];
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:AI_PROMPTS[aiMode]+'\n\n'+'Student says: '+text+'\n\nConversation so far:\n'+chatHistory.slice(-6).map(m=>`${m.role==='user'?'Student':'You'}: ${m.content}`).join('\n')}]})
+    });
+    const data=await resp.json();
+    removeDots();
+    if(!resp.ok){addAI('Error '+resp.status+': '+(data?.error?.message||'Unknown'));document.getElementById('chatBtn').disabled=false;return;}
+    const reply=data.content?.[0]?.text||'(empty)';
+    chatHistory.push({role:'assistant',content:reply});
+    addAI(reply);
+    ST.xp+=5;save();
+  }catch(e){
+    removeDots();
+    addAI('⚠️ Error de conexión: '+e.message+'. Verifica tu internet.');
+  }
+  document.getElementById('chatBtn').disabled=false;
+}
+
+function onChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+
+function autoResize(ta){
+  ta.style.height='auto';
+  ta.style.height=Math.min(ta.scrollHeight,100)+'px';
+}
+
+// ─── VOICE INPUT FOR CHAT ───
+function toggleVoiceInput(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    alert('Tu navegador no soporta reconocimiento de voz. Usa Chrome para esta función.');return;
+  }
+  const micBtn=document.getElementById('chatMicBtn');
+  if(isChatRecording){
+    if(chatRecognition) chatRecognition.stop();
+    return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  chatRecognition=new SR();
+  chatRecognition.lang='en-US';
+  chatRecognition.continuous=false;
+  chatRecognition.interimResults=true;
+
+  chatRecognition.onstart=()=>{
+    isChatRecording=true;
+    micBtn.classList.add('active');micBtn.title='Parar grabación';
+  };
+  chatRecognition.onresult=e=>{
+    let final='',interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    const inp=document.getElementById('chatIn');
+    if(inp) inp.value=(final||interim);
+  };
+  chatRecognition.onend=()=>{
+    isChatRecording=false;
+    micBtn.classList.remove('active');micBtn.title='Hablar con voz';
+    const inp=document.getElementById('chatIn');
+    if(inp&&inp.value.trim()) sendMsg();
+  };
+  chatRecognition.onerror=e=>{
+    isChatRecording=false;
+    micBtn.classList.remove('active');
+    console.error('Speech error:',e.error);
+  };
+  chatRecognition.start();
+}
+
+// ═══════════════════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════════════════
+function renderProfile(){
+  const avg=ST.scores.length?Math.round(ST.scores.reduce((a,b)=>a+b,0)/ST.scores.length)+'%':'—';
+  document.getElementById('pName').textContent='Estudiante B1→C1';
+  document.getElementById('achGrid').innerHTML=[
+    {ico:'🔥',val:ST.streak,lab:'Racha'},
+    {ico:'⚡',val:ST.xp,lab:'XP Total'},
+    {ico:'📖',val:ST.words,lab:'Palabras'},
+    {ico:'🎯',val:avg,lab:'Promedio'},
+    {ico:'📚',val:ST.lessons,lab:'Lecciones'},
+    {ico:'🏆',val:Math.round(ST.progress)+'%',lab:'Progreso'},
+  ].map(a=>`<div class="ach"><div class="ai">${a.ico}</div><div class="av">${a.val}</div><div class="al">${a.lab}</div></div>`).join('');
+  const h=document.getElementById('evalHist');
+  if(!ST.scores.length){h.innerHTML='<div style="color:var(--t2);font-size:.84rem">No hay evaluaciones aún.</div>';return;}
+  h.innerHTML=ST.scores.slice(-8).reverse().map((s,i)=>`
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:11px 15px;margin-bottom:7px">
+      <span style="font-size:.83rem">Evaluación #${ST.scores.length-i}</span>
+      <span style="font-family:var(--ff);font-weight:700;font-size:.95rem;color:${s>=80?'var(--a3)':s>=60?'var(--gold)':'var(--a2)'}">${s}%</span>
+    </div>`).join('');
+}
+
+function resetAll(){
+  if(!confirm('¿Seguro que quieres reiniciar todo tu progreso?')) return;
+  localStorage.removeItem('emp_st3');
+  ST={streak:0,xp:0,words:0,lessons:0,scores:[],done:[],vocabIdx:0,vocabGood:0,vocabBad:0,progress:0,lastDate:'',speakIdx:0};
+  save();renderHome();renderProfile();
+  alert('Progreso reiniciado.');
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showScreen(name){
+  speechSynth.cancel();
+  if(isSpeakRecording&&speakRecognition) speakRecognition.stop();
+  if(isChatRecording&&chatRecognition) chatRecognition.stop();
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.bn').forEach(b=>b.classList.remove('active'));
+  const sc=document.getElementById('sc-'+name);if(sc) sc.classList.add('active');
+  const bn=document.getElementById('bn-'+name);if(bn) bn.classList.add('active');
+  if(name==='home') renderHome();
+  if(name==='vocab'){renderVocab();matchWordSel=null;matchDone=[];}
+  if(name==='profile') renderProfile();
+  if(name==='ai') initChat();
+  if(name==='speaking') renderSpeakExercise(0);
+  window.scrollTo(0,0);
+}
+
+function goBack(){showScreen(prevScreen||'lessons');prevScreen='lessons';}
+
+window.addEventListener('load',init);
+// Load voices after page load
+window.speechSynthesis.onvoiceschanged=()=>{speechSynth.getVoices();};
+</script>
+</body>
+</html>
